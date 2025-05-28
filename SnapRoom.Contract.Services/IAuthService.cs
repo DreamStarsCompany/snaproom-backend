@@ -1,0 +1,23 @@
+﻿using SnapRoom.Common.Base;
+using SnapRoom.Contract.Repositories.Dtos.AccountDtos;
+
+namespace SnapRoom.Contract.Services
+{
+	public interface IAuthService
+	{
+		Task<string> CustomerLogin(LoginDto loginDto);
+		Task<string> DesignerLogin(LoginDto loginDto);
+		Task Register(RegisterDto registerDto);
+		Task<bool> VerifyAccount(string token);
+		Task ForgetPassword(string email);
+		Task VerifyResetPassowrd(string token);
+		Task ResetPassword(string token, string newPassword);
+		Task UpdatePassword(string password, string newPassword);
+		Task UpdateEmail(string newEmail);
+		Task ConfirmUpdateEmail(string otp);
+		void UpdateAudits(BaseEntity entity, bool isCreating, bool isDeleting = false);
+		string GetCurrentAccountId();
+		string GetCurrentRole();
+
+	}
+}
