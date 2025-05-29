@@ -21,7 +21,7 @@ namespace SnapRoom.APIs.Controllers
 		[HttpGet]
 		public async Task<IActionResult> CustomerLogin(int pageNumber = -1, int pageSize = -1)
 		{
-			var products = await _productService.GetProducts(pageNumber, pageSize);
+			var products = await _productService.GetDesigns(pageNumber, pageSize);
 
 			return Ok(new BaseResponse<object>(
 				statusCode: StatusCodeEnum.OK,
