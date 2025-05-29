@@ -39,11 +39,11 @@ namespace SnapRoom.Services
 			return new BasePaginatedList<object>(responseItems, query.Count, pageNumber, pageSize);
 		}
 
-		public async Task<BasePaginatedList<object>> Get(int pageNumber, int pageSize)
+		public async Task<BasePaginatedList<object>> GetFurnitures(int pageNumber, int pageSize)
 		{
 
 			List<Product> query = _unitOfWork.GetRepository<Product>().GetAll().ToList();
-
+			 
 			var responseItems = query.Select(x => new {
 				x.Id,
 				x.Name,

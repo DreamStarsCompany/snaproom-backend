@@ -5,6 +5,8 @@ namespace SnapRoom.Contract.Services
 {
 	public interface IProductService
 	{
-		Task<BasePaginatedList<object>> GetProducts(int pageNumber, int pageSize);
+		Task<BasePaginatedList<object>> GetFurnitures(int pageNumber, int pageSize);
+		Task<BasePaginatedList<object>> GetDesigns(int pageNumber, int pageSize);
+
 	}
 }
