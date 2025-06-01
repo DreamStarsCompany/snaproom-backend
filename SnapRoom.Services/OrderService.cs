@@ -167,7 +167,10 @@ namespace SnapRoom.Services
 
 
 			Order cart = await _unitOfWork.GetRepository<Order>().Entities
-				.Where(o => o.CustomerId == customerId && o.IsCart).FirstOrDefaultAsync() ?? new();
+				.Where(o => o.CustomerId == customerId && o.IsCart).FirstOrDefaultAsync() ?? new() 
+				{
+					CustomerId = customerId
+				};
 
 
 			// Case old cart & old detail
@@ -191,6 +194,11 @@ namespace SnapRoom.Services
 
 			}
 
+			if (cart.OrderDetails is null || cart.OrderDetails.Count == 0)
+			{
+				await _unitOfWork.GetRepository<Order>().InsertAsync(cart);
+			}
+
 			OrderDetail orderDetail = new()
 			{
 				OrderId = cart.Id,
@@ -202,10 +210,6 @@ namespace SnapRoom.Services
 			cart.OrderPrice += orderDetail.DetailPrice;
 			await _unitOfWork.GetRepository<OrderDetail>().InsertAsync(orderDetail);
 
-			if (cart.OrderDetails is null || cart.OrderDetails.Count == 0)
-			{
-				await _unitOfWork.GetRepository<Order>().InsertAsync(cart);
-			}
 			await _unitOfWork.SaveAsync();
 		}
 
