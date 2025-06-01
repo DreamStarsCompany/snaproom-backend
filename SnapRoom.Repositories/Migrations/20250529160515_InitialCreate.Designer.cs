@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using SnapRoom.Repositories.DatabaseContext;
 
@@ -11,9 +12,11 @@ using SnapRoom.Repositories.DatabaseContext;
 namespace SnapRoom.Repositories.Migrations
 {
     [DbContext(typeof(SnapRoomDbContext))]
-    partial class SnapRoomDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250529160515_InitialCreate")]
+    partial class InitialCreate
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -29,9 +32,6 @@ namespace SnapRoom.Repositories.Migrations
 
                     b.Property<string>("AvatarSource")
                         .HasColumnType("nvarchar(450)");
-
-                    b.Property<string>("ContactNumber")
-                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("CreatedBy")
                         .HasColumnType("nvarchar(max)");
@@ -69,14 +69,8 @@ namespace SnapRoom.Repositories.Migrations
                     b.Property<string>("Profession")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("ResetPasswordToken")
-                        .HasColumnType("nvarchar(max)");
-
                     b.Property<int>("Role")
                         .HasColumnType("int");
-
-                    b.Property<string>("VerificationToken")
-                        .HasColumnType("nvarchar(max)");
 
                     b.HasKey("Id");
 
@@ -115,9 +109,6 @@ namespace SnapRoom.Repositories.Migrations
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
-
-                    b.Property<bool>("Style")
-                        .HasColumnType("bit");
 
                     b.HasKey("Id");
 
@@ -265,11 +256,7 @@ namespace SnapRoom.Repositories.Migrations
                     b.Property<string>("Id")
                         .HasColumnType("nvarchar(36)");
 
-                    b.Property<string>("Address")
-                        .HasColumnType("nvarchar(max)");
-
                     b.Property<string>("CustomerId")
-                        .IsRequired()
                         .HasColumnType("nvarchar(36)");
 
                     b.Property<string>("DesignerId")
@@ -355,8 +342,8 @@ namespace SnapRoom.Repositories.Migrations
                     b.Property<string>("Id")
                         .HasColumnType("nvarchar(36)");
 
-                    b.Property<bool>("Active")
-                        .HasColumnType("bit");
+                    b.Property<string>("CategoryId")
+                        .HasColumnType("nvarchar(36)");
 
                     b.Property<string>("CreatedBy")
                         .HasColumnType("nvarchar(max)");
@@ -394,26 +381,13 @@ namespace SnapRoom.Repositories.Migrations
 
                     b.HasKey("Id");
 
+                    b.HasIndex("CategoryId");
+
                     b.HasIndex("DesignerId");
 
                     b.HasIndex("ParentDesignId");
 
                     b.ToTable("Products");
-                });
-
-            modelBuilder.Entity("SnapRoom.Contract.Repositories.Entities.ProductCategory", b =>
-                {
-                    b.Property<string>("ProductId")
-                        .HasColumnType("nvarchar(450)");
-
-                    b.Property<string>("CategoryId")
-                        .HasColumnType("nvarchar(36)");
-
-                    b.HasKey("ProductId", "CategoryId");
-
-                    b.HasIndex("CategoryId");
-
-                    b.ToTable("ProductCategory");
                 });
 
             modelBuilder.Entity("SnapRoom.Contract.Repositories.Entities.ProductReview", b =>
@@ -591,8 +565,7 @@ namespace SnapRoom.Repositories.Migrations
                     b.HasOne("SnapRoom.Contract.Repositories.Entities.Account", "Customer")
                         .WithMany("CustomerOrders")
                         .HasForeignKey("CustomerId")
-                        .OnDelete(DeleteBehavior.NoAction)
-                        .IsRequired();
+                        .OnDelete(DeleteBehavior.NoAction);
 
                     b.HasOne("SnapRoom.Contract.Repositories.Entities.Account", "Designer")
                         .WithMany("DesignerOrders")
@@ -625,6 +598,11 @@ namespace SnapRoom.Repositories.Migrations
 
             modelBuilder.Entity("SnapRoom.Contract.Repositories.Entities.Product", b =>
                 {
+                    b.HasOne("SnapRoom.Contract.Repositories.Entities.Category", "Category")
+                        .WithMany()
+                        .HasForeignKey("CategoryId")
+                        .OnDelete(DeleteBehavior.NoAction);
+
                     b.HasOne("SnapRoom.Contract.Repositories.Entities.Account", "Designer")
                         .WithMany("Products")
                         .HasForeignKey("DesignerId")
@@ -635,28 +613,11 @@ namespace SnapRoom.Repositories.Migrations
                         .HasForeignKey("ParentDesignId")
                         .OnDelete(DeleteBehavior.NoAction);
 
+                    b.Navigation("Category");
+
                     b.Navigation("Designer");
 
                     b.Navigation("ParentDesign");
-                });
-
-            modelBuilder.Entity("SnapRoom.Contract.Repositories.Entities.ProductCategory", b =>
-                {
-                    b.HasOne("SnapRoom.Contract.Repositories.Entities.Category", "Category")
-                        .WithMany()
-                        .HasForeignKey("CategoryId")
-                        .OnDelete(DeleteBehavior.NoAction)
-                        .IsRequired();
-
-                    b.HasOne("SnapRoom.Contract.Repositories.Entities.Product", "Product")
-                        .WithMany("ProductCategories")
-                        .HasForeignKey("CategoryId")
-                        .OnDelete(DeleteBehavior.NoAction)
-                        .IsRequired();
-
-                    b.Navigation("Category");
-
-                    b.Navigation("Product");
                 });
 
             modelBuilder.Entity("SnapRoom.Contract.Repositories.Entities.ProductReview", b =>
@@ -744,8 +705,6 @@ namespace SnapRoom.Repositories.Migrations
                     b.Navigation("Images");
 
                     b.Navigation("OrderDetails");
-
-                    b.Navigation("ProductCategories");
 
                     b.Navigation("ProductReviews");
                 });

@@ -6,9 +6,9 @@ namespace SnapRoom.Contract.Repositories.Entities
 	{
 		public DateTimeOffset Time { get; set; } = CoreHelper.SystemTimeNow;
 
-		public string? StatusId { get; set; }
-		public virtual Status? Status { get; set; }
-		public string? OrderId { get; set; }
-		public virtual Order? Order { get; set; }
+		public string StatusId { get; set; } = default!;
+		public virtual Status Status { get; set; } = default!;
+		public string OrderId { get; set; } = default!;
+		public virtual Order Order { get; set; } = default!;
 	}
 }

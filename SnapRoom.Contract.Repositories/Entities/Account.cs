@@ -9,7 +9,10 @@ namespace SnapRoom.Contract.Repositories.Entities
 		public string Email { get; set; } = default!;
 		public string Password { get; set; } = default!;
 		public string? Profession { get; set; }
+		public string? ContactNumber { get; set; }
 		public RoleEnum Role { get; set; }
+		public string? VerificationToken { get; set; }
+		public string? ResetPasswordToken { get; set; }
 
 		public string? PlanId { get; set; }
 		public virtual Plan? Plan { get; set; }

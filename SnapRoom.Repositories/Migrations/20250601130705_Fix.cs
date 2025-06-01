@@ -5,24 +5,18 @@
 namespace SnapRoom.Repositories.Migrations
 {
     /// <inheritdoc />
-    public partial class FixPasswork : Migration
+    public partial class Fix : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
         {
-            migrationBuilder.RenameColumn(
-                name: "Passwork",
-                table: "Accounts",
-                newName: "Password");
+
         }
 
         /// <inheritdoc />
         protected override void Down(MigrationBuilder migrationBuilder)
         {
-            migrationBuilder.RenameColumn(
-                name: "Password",
-                table: "Accounts",
-                newName: "Passwork");
+
         }
     }
 }

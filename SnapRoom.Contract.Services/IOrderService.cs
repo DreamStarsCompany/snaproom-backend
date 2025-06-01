@@ -1,6 +1,15 @@
-﻿namespace SnapRoom.Contract.Services
+﻿using SnapRoom.Common.Base;
+using SnapRoom.Contract.Repositories.Dtos.OrderDtos;
+
+namespace SnapRoom.Contract.Services
 {
 	public interface IOrderService
 	{
+		Task<BasePaginatedList<object>> GetOrdersForCustomer(int pageNumber, int pageSize);
+		Task<BasePaginatedList<object>> GetOrdersForDesigner(int pageNumber, int pageSize);
+		Task<object> GetOrderById(string id);
+		Task<object> GetCart();
+		Task AddToCart(CartItemDto dto);
+		Task DeleteFromCart(string productId);
 	}
 }
