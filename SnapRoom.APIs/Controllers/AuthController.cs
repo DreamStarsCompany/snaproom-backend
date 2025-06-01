@@ -41,5 +41,38 @@ namespace SnapRoom.APIs.Controllers
 			));
 		}
 
+		[HttpPost("customer/register")]
+		public async Task<IActionResult> CustomerRegister(RegisterDto registerDto)
+		{
+			await _authService.CustomerRegister(registerDto);
+
+			return Ok(new BaseResponse<object>(
+				statusCode: StatusCodeEnum.OK,
+				message: "Đăng ký thành công",
+				data: null
+			));
+		}
+
+		[HttpPost("designer/register")]
+		public async Task<IActionResult> DesignerRegister(RegisterDto registerDto)
+		{
+			await _authService.DesignerRegister(registerDto);
+
+			return Ok(new BaseResponse<object>(
+				statusCode: StatusCodeEnum.OK,
+				message: "Đăng ký thành công",
+				data: null
+			));
+		}
+
+		[HttpGet("verify-account")]
+		public async Task<IActionResult> VerifyAccount(string token)
+		{
+			await _authService.VerifyAccount(token);
+
+			return Redirect("https://www.google.com/");
+		}
+
+
 	}
 }

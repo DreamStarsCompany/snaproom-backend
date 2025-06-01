@@ -18,10 +18,22 @@ namespace SnapRoom.APIs.Controllers
 			_productService = productService;
 		}
 
-		[HttpGet]
-		public async Task<IActionResult> CustomerLogin(int pageNumber = -1, int pageSize = -1)
+		[HttpGet("designs")]
+		public async Task<IActionResult> GetDesigns(int pageNumber = -1, int pageSize = -1)
 		{
 			var products = await _productService.GetDesigns(pageNumber, pageSize);
+
+			return Ok(new BaseResponse<object>(
+				statusCode: StatusCodeEnum.OK,
+				message: "Lấy sản phẩm thành công",
+				data: products
+			));
+		}
+
+		[HttpGet("furnitures")]
+		public async Task<IActionResult> GetFurnitures(int pageNumber = -1, int pageSize = -1)
+		{
+			var products = await _productService.GetFurnitures(pageNumber, pageSize);
 
 			return Ok(new BaseResponse<object>(
 				statusCode: StatusCodeEnum.OK,

@@ -7,8 +7,9 @@ namespace SnapRoom.Contract.Services
 	{
 		Task<string> CustomerLogin(LoginDto loginDto);
 		Task<string> DesignerLogin(LoginDto loginDto);
-		Task Register(RegisterDto registerDto);
-		Task<bool> VerifyAccount(string token);
+		Task CustomerRegister(RegisterDto registerDto);
+		Task DesignerRegister(RegisterDto registerDto);
+		Task VerifyAccount(string token);
 		Task ForgetPassword(string email);
 		Task VerifyResetPassowrd(string token);
 		Task ResetPassword(string token, string newPassword);

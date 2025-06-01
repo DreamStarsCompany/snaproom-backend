@@ -73,7 +73,7 @@ namespace SnapRoom.Repositories.Migrations
                     Id = table.Column<string>(type: "nvarchar(36)", nullable: false),
                     Name = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     Email = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    Passwork = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Password = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     Profession = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     Role = table.Column<int>(type: "int", nullable: false),
                     PlanId = table.Column<string>(type: "nvarchar(36)", nullable: true),
@@ -114,6 +114,29 @@ namespace SnapRoom.Repositories.Migrations
                     table.ForeignKey(
                         name: "FK_Conversations_Accounts_DesignerId",
                         column: x => x.DesignerId,
+                        principalTable: "Accounts",
+                        principalColumn: "Id");
+                });
+
+            migrationBuilder.CreateTable(
+                name: "Notification",
+                columns: table => new
+                {
+                    Id = table.Column<string>(type: "nvarchar(36)", nullable: false),
+                    Title = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Type = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    TypeId = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    IsRead = table.Column<bool>(type: "bit", nullable: false),
+                    CreatedAt = table.Column<DateTimeOffset>(type: "datetimeoffset", nullable: false),
+                    ReadAt = table.Column<DateTimeOffset>(type: "datetimeoffset", nullable: true),
+                    AccountId = table.Column<string>(type: "nvarchar(36)", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Notification", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_Notification_Accounts_AccountId",
+                        column: x => x.AccountId,
                         principalTable: "Accounts",
                         principalColumn: "Id");
                 });
@@ -372,6 +395,11 @@ namespace SnapRoom.Repositories.Migrations
                 column: "SenderId");
 
             migrationBuilder.CreateIndex(
+                name: "IX_Notification_AccountId",
+                table: "Notification",
+                column: "AccountId");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_OrderDetails_ProductId",
                 table: "OrderDetails",
                 column: "ProductId");
@@ -434,6 +462,9 @@ namespace SnapRoom.Repositories.Migrations
 
             migrationBuilder.DropTable(
                 name: "Messages");
+
+            migrationBuilder.DropTable(
+                name: "Notification");
 
             migrationBuilder.DropTable(
                 name: "OrderDetails");

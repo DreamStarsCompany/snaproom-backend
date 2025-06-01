@@ -1,9 +1,9 @@
 ﻿using AutoMapper;
+using Microsoft.EntityFrameworkCore;
 using SnapRoom.Common.Base;
 using SnapRoom.Contract.Repositories.Entities;
 using SnapRoom.Contract.Repositories.IUOW;
 using SnapRoom.Contract.Services;
-using System.Linq.Expressions;
 
 namespace SnapRoom.Services
 {
@@ -23,7 +23,8 @@ namespace SnapRoom.Services
 		public async Task<BasePaginatedList<object>> GetDesigns(int pageNumber, int pageSize)
 		{
 
-			List<Product> query = _unitOfWork.GetRepository<Product>().GetAll().ToList();
+			List<Product> query = await _unitOfWork.GetRepository<Product>().Entities
+				.Where(p => p.Design != null).ToListAsync();
 
 			var responseItems = query.Select(x => new {
 				x.Id,
@@ -31,10 +32,7 @@ namespace SnapRoom.Services
 				x.Rating,
 				x.Price,
 				Image = new { x.Images?.FirstOrDefault()?.ImageSource },
-				Category = new { x.Category?.Name }
 			}).ToList();
-
-			await _unitOfWork.SaveAsync();
 
 			return new BasePaginatedList<object>(responseItems, query.Count, pageNumber, pageSize);
 		}
@@ -42,18 +40,16 @@ namespace SnapRoom.Services
 		public async Task<BasePaginatedList<object>> GetFurnitures(int pageNumber, int pageSize)
 		{
 
-			List<Product> query = _unitOfWork.GetRepository<Product>().GetAll().ToList();
-			 
+			List<Product> query = await _unitOfWork.GetRepository<Product>().Entities
+				.Where(p => p.Furniture != null).ToListAsync();
+
 			var responseItems = query.Select(x => new {
 				x.Id,
 				x.Name,
 				x.Rating,
 				x.Price,
 				Image = new { x.Images?.FirstOrDefault()?.ImageSource },
-				Category = new { x.Category?.Name }
 			}).ToList();
-
-			await _unitOfWork.SaveAsync();
 
 			return new BasePaginatedList<object>(responseItems, query.Count, pageNumber, pageSize);
 		}

@@ -34,6 +34,8 @@ namespace SnapRoom.Repositories.DatabaseContext
 				.HasKey(p => new { p.ProductId, p.CustomerId });
 			modelBuilder.Entity<TrackingStatus>()
 				.HasKey(s => new { s.StatusId, s.OrderId });
+			modelBuilder.Entity<ProductCategory>()
+				.HasKey(c => new { c.ProductId, c.CategoryId });
 
 
 
@@ -68,7 +70,7 @@ namespace SnapRoom.Repositories.DatabaseContext
 			modelBuilder.Entity<Product>()
 				.HasMany(p => p.Images).WithOne(i => i.Product).HasForeignKey(i => i.ProductId).OnDelete(DeleteBehavior.NoAction);
 			modelBuilder.Entity<Product>()
-				.HasOne(p => p.Category).WithMany().HasForeignKey(p => p.CategoryId).OnDelete(DeleteBehavior.NoAction);
+				.HasMany(p => p.ProductCategories).WithOne(c => c.Product).HasForeignKey(c => c.CategoryId).OnDelete(DeleteBehavior.NoAction);
 			modelBuilder.Entity<Product>()
 				.HasOne(p => p.Design).WithOne(d => d.Product).HasForeignKey<Design>(d => d.Id).OnDelete(DeleteBehavior.NoAction);
 			modelBuilder.Entity<Product>()
@@ -86,6 +88,8 @@ namespace SnapRoom.Repositories.DatabaseContext
 			modelBuilder.Entity<TrackingStatus>()
 				.HasOne(c => c.Status).WithMany().HasForeignKey(t => t.StatusId).OnDelete(DeleteBehavior.NoAction);
 
+			modelBuilder.Entity<ProductCategory>()
+				.HasOne(p => p.Category).WithMany().HasForeignKey(p => p.CategoryId).OnDelete(DeleteBehavior.NoAction);
 		}
 	}
 }

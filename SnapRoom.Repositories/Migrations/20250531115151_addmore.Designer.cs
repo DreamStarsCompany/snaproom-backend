@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using SnapRoom.Repositories.DatabaseContext;
 
@@ -11,9 +12,11 @@ using SnapRoom.Repositories.DatabaseContext;
 namespace SnapRoom.Repositories.Migrations
 {
     [DbContext(typeof(SnapRoomDbContext))]
-    partial class SnapRoomDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250531115151_addmore")]
+    partial class addmore
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -265,11 +268,7 @@ namespace SnapRoom.Repositories.Migrations
                     b.Property<string>("Id")
                         .HasColumnType("nvarchar(36)");
 
-                    b.Property<string>("Address")
-                        .HasColumnType("nvarchar(max)");
-
                     b.Property<string>("CustomerId")
-                        .IsRequired()
                         .HasColumnType("nvarchar(36)");
 
                     b.Property<string>("DesignerId")
@@ -354,9 +353,6 @@ namespace SnapRoom.Repositories.Migrations
                 {
                     b.Property<string>("Id")
                         .HasColumnType("nvarchar(36)");
-
-                    b.Property<bool>("Active")
-                        .HasColumnType("bit");
 
                     b.Property<string>("CreatedBy")
                         .HasColumnType("nvarchar(max)");
@@ -591,8 +587,7 @@ namespace SnapRoom.Repositories.Migrations
                     b.HasOne("SnapRoom.Contract.Repositories.Entities.Account", "Customer")
                         .WithMany("CustomerOrders")
                         .HasForeignKey("CustomerId")
-                        .OnDelete(DeleteBehavior.NoAction)
-                        .IsRequired();
+                        .OnDelete(DeleteBehavior.NoAction);
 
                     b.HasOne("SnapRoom.Contract.Repositories.Entities.Account", "Designer")
                         .WithMany("DesignerOrders")

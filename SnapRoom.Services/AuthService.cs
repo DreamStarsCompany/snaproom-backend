@@ -12,6 +12,7 @@ using SnapRoom.Contract.Services;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
+using static SnapRoom.Common.Base.BaseException;
 
 namespace SnapRoom.Services
 {
@@ -20,12 +21,14 @@ namespace SnapRoom.Services
 		private readonly IUnitOfWork _unitOfWork;
 		private readonly IConfiguration _configuration;
 		private readonly IHttpContextAccessor _httpContextAccessor;
+		private readonly EmailService _mailService;
 
-		public AuthService(IUnitOfWork unitOfWork, IConfiguration configuration, IHttpContextAccessor httpContextAccessor)
+		public AuthService(IUnitOfWork unitOfWork, IConfiguration configuration, IHttpContextAccessor httpContextAccessor, EmailService mailService)
 		{
 			_unitOfWork = unitOfWork;
 			_configuration = configuration;
 			_httpContextAccessor = httpContextAccessor;
+			_mailService = mailService;
 		}
 
 		public Task ConfirmUpdateEmail(string otp)
@@ -40,7 +43,9 @@ namespace SnapRoom.Services
 
 		public string GetCurrentAccountId()
 		{
-			throw new NotImplementedException();
+			var token = _httpContextAccessor.HttpContext?.Request.Headers["Authorization"].FirstOrDefault()?.Split(" ").Last();
+
+			return GetAccountIdFromTokenHeader(token);
 		}
 
 		public string GetCurrentRole()
@@ -56,8 +61,14 @@ namespace SnapRoom.Services
 
 			if (account == null || !BCrypt.Net.BCrypt.Verify(loginDto.Password, account.Password))
 			{
-				throw new BaseException.ErrorException(401, "unauthorized", "Sai mật khẩu hoặc tài khoản");
+				throw new ErrorException(401, "unauthorized", "Sai mật khẩu hoặc tài khoản");
 			}
+
+			if (account.VerificationToken != null)
+			{
+				throw new ErrorException(403, "forbidden", "Tài khoản chưa được xác thực, khách hàng vui lòng kiểm tra hộp mail");
+			}
+
 
 			return GenerateJwtToken(account);
 		}
@@ -70,43 +81,82 @@ namespace SnapRoom.Services
 
 			if (account == null || !BCrypt.Net.BCrypt.Verify(loginDto.Password, account.Password))
 			{
-				throw new BaseException.ErrorException(401, "unauthorized", "Sai mật khẩu hoặc tài khoản");
+				throw new ErrorException(401, "unauthorized", "Sai mật khẩu hoặc tài khoản");
 			}
+
+			if (account.VerificationToken != null)
+			{
+				throw new ErrorException(403, "forbidden", "Tài khoản chưa được xác thực, khách hàng vui lòng kiểm tra hộp mail");
+			}
+
 
 			return GenerateJwtToken(account);
 		}
 
-		public async Task Register(RegisterDto registerDto)
+		public async Task CustomerRegister(RegisterDto registerDto)
 		{
-			//// Check if the user already exists
-			//var existingAccount = await _unitOfWork.GetRepository<Account>().Entities
-			//	.Where(a => a.Email == registerDto.Email && a.DeletedBy == null)
-			//	.FirstOrDefaultAsync();
-			//if (existingAccount != null)
-			//{
-			//	throw new BaseException.ErrorException(409, "conflict", "Email này đã được sử dụng, vui lòng thử lại");
-			//}
+			// Check if the user already exists
+			var existingCustomer = await _unitOfWork.GetRepository<Account>().Entities
+				.Where(a => a.Email == registerDto.Email && a.DeletedBy == null & a.Role == RoleEnum.Customer)
+				.FirstOrDefaultAsync();
+			if (existingCustomer != null)
+			{
+				throw new ErrorException(409, "conflict", "Email này đã được sử dụng, vui lòng thử lại");
+			}
 
-			//// Hash the password
-			//var hashedPassword = BCrypt.Net.BCrypt.HashPassword(registerDto.Password);
+			// Hash the password
+			var hashedPassword = BCrypt.Net.BCrypt.HashPassword(registerDto.Password);
 
-			//// Create new user entity
-			//Account newCustomer = new()
-			//{
-			//	Name = registerDto.Name,
-			//	Password = hashedPassword,
-			//	Email = registerDto.Email,
-			//	Role = RoleEnum.Customer,
-			//	VerificationToken = Guid.NewGuid().ToString()
-			//};
+			// Create new user entity
+			Account newCustomer = new()
+			{
+				Name = registerDto.Name,
+				Password = hashedPassword,
+				Email = registerDto.Email,
+				Role = RoleEnum.Customer,
+				VerificationToken = Guid.NewGuid().ToString()
+			};
 
-			//newCustomer.CreatedBy = newCustomer.Id;
-			//newCustomer.LastUpdatedBy = newCustomer.Id;
-			//newCustomer.EmailLastUpdatedTime = newCustomer.CreatedTime;
-			//// Save account to the database
-			//await _unitOfWork.GetRepository<Account>().InsertAsync(newCustomer);
-			//await _unitOfWork.SaveAsync();
+			// Save account to the database
+			await _unitOfWork.GetRepository<Account>().InsertAsync(newCustomer);
+			await _unitOfWork.SaveAsync();
+
+
+			await _mailService.SendVerificationMail(newCustomer);
 		}
+
+		public async Task DesignerRegister(RegisterDto registerDto)
+		{
+			// Check if the user already exists
+			var existingDesigner = await _unitOfWork.GetRepository<Account>().Entities
+				.Where(a => a.Email == registerDto.Email && a.DeletedBy == null & a.Role == RoleEnum.Designer)
+				.FirstOrDefaultAsync();
+			if (existingDesigner != null)
+			{
+				throw new BaseException.ErrorException(409, "conflict", "Email này đã được sử dụng, vui lòng thử lại");
+			}
+
+			// Hash the password
+			var hashedPassword = BCrypt.Net.BCrypt.HashPassword(registerDto.Password);
+
+			// Create new user entity
+			Account newDesigner = new()
+			{
+				Name = registerDto.Name,
+				Password = hashedPassword,
+				Email = registerDto.Email,
+				Role = RoleEnum.Designer,
+				VerificationToken = Guid.NewGuid().ToString()
+			};
+
+			// Save account to the database
+			await _unitOfWork.GetRepository<Account>().InsertAsync(newDesigner);
+			await _unitOfWork.SaveAsync();
+
+			await _mailService.SendVerificationMail(newDesigner);
+
+		}
+
 
 		public Task ResetPassword(string token, string newPassword)
 		{
@@ -128,14 +178,86 @@ namespace SnapRoom.Services
 			throw new NotImplementedException();
 		}
 
-		public Task<bool> VerifyAccount(string token)
+		public async Task VerifyAccount(string token)
 		{
-			throw new NotImplementedException();
+			Account? account = _unitOfWork.GetRepository<Account>().Entities.Where(a => a.VerificationToken == token && a.DeletedBy == null).FirstOrDefault();
+
+			if (account == null)
+			{
+				throw new ErrorException(502, "bad_gateway", "Token is not valid or is expired");
+			}
+			account.VerificationToken = null;
+
+			await _unitOfWork.SaveAsync();
 		}
 
 		public Task VerifyResetPassowrd(string token)
 		{
 			throw new NotImplementedException();
+		}
+
+		private ClaimsPrincipal DecodeJwtToken(string token)
+		{
+			// Retrieve the JWT secret from configuration
+			var secret = _configuration["JwtSettings:Secret"] ?? throw new ArgumentNullException("JwtSettings:Secret");
+			var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(secret));
+
+			// Set up token validation parameters
+			var tokenHandler = new JwtSecurityTokenHandler();
+			var validationParameters = new TokenValidationParameters
+			{
+				ValidateIssuerSigningKey = true,
+				IssuerSigningKey = key,
+				ValidateIssuer = false,
+				ValidateAudience = false,
+				ValidateLifetime = true
+			};
+
+			try
+			{
+				// Validate the token and return the claims principal
+				var principal = tokenHandler.ValidateToken(token, validationParameters, out var validatedToken);
+				return principal;
+			}
+			catch (SecurityTokenExpiredException)
+			{
+				throw new SecurityTokenException("Token has expired");
+			}
+			catch (SecurityTokenInvalidSignatureException)
+			{
+				throw new SecurityTokenException("Invalid token signature");
+			}
+			catch (Exception)
+			{
+				throw new SecurityTokenException("Invalid token");
+			}
+		}
+
+		private string GetAccountIdFromTokenHeader(string? token)
+		{
+			// Check if the token is null or empty
+			if (string.IsNullOrEmpty(token))
+			{
+				return string.Empty; // Handle null or empty token gracefully
+			}
+
+			// Decode the JWT token and extract claims
+			var principal = DecodeJwtToken(token);
+
+			if (principal == null)
+			{
+				return string.Empty; // Handle null principal gracefully
+			}
+
+			// Extract claims from the principal
+			var accountIdClaim = principal.Claims.FirstOrDefault(c => c.Type == "Id");
+
+			if (accountIdClaim != null && Guid.TryParse(accountIdClaim.Value, out Guid parsedAccountId))
+			{
+				return parsedAccountId.ToString();
+			}
+
+			return string.Empty;
 		}
 
 		private string GenerateJwtToken(Account account)

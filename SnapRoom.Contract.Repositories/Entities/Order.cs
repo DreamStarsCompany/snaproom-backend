@@ -12,9 +12,10 @@ namespace SnapRoom.Contract.Repositories.Entities
 		public decimal OrderPrice { get; set; }
 		public MethodEnum Method { get; set; }
 		public bool IsCart { get; set; } = true;
+		public string? Address { get; set; }
 
-		public string? CustomerId { get; set; }
-		public virtual Account? Customer { get; set; }
+		public string CustomerId { get; set; } = default!;
+		public virtual Account Customer { get; set; } = default!;
 		public string? DesignerId { get; set; }
 		public virtual Account? Designer { get; set; }
 		public virtual ICollection<TrackingStatus>? TrackingStatuses { get; set; }
