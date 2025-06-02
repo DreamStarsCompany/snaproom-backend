@@ -1,9 +1,8 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using SnapRoom.Common.Base;
 using SnapRoom.Common.Enum;
-using SnapRoom.Contract.Repositories.Dtos.AccountDtos;
+using SnapRoom.Contract.Repositories.Dtos.ProductDtos;
 using SnapRoom.Contract.Services;
-using SnapRoom.Services;
 
 namespace SnapRoom.APIs.Controllers
 {
@@ -41,6 +40,19 @@ namespace SnapRoom.APIs.Controllers
 				data: products
 			));
 		}
+
+		[HttpPost("designs")]
+		public async Task<IActionResult> CreateDesign(DesignCreateDto dto)
+		{
+			await _productService.CreateDesign(dto);
+
+			return Ok(new BaseResponse<object>(
+				statusCode: StatusCodeEnum.OK,
+				message: "Tạo bản thiết kế thành công",
+				data: null
+			));
+		}
+
 
 	}
 }

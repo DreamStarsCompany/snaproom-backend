@@ -12,8 +12,8 @@ using SnapRoom.Repositories.DatabaseContext;
 namespace SnapRoom.Repositories.Migrations
 {
     [DbContext(typeof(SnapRoomDbContext))]
-    [Migration("20250601130705_Fix")]
-    partial class Fix
+    [Migration("20250602035203_InitialBaseline")]
+    partial class InitialBaseline
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -373,6 +373,10 @@ namespace SnapRoom.Repositories.Migrations
                     b.Property<DateTimeOffset?>("DeletedTime")
                         .HasColumnType("datetimeoffset");
 
+                    b.Property<string>("Description")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<string>("DesignerId")
                         .HasColumnType("nvarchar(36)");
 
@@ -407,7 +411,7 @@ namespace SnapRoom.Repositories.Migrations
             modelBuilder.Entity("SnapRoom.Contract.Repositories.Entities.ProductCategory", b =>
                 {
                     b.Property<string>("ProductId")
-                        .HasColumnType("nvarchar(450)");
+                        .HasColumnType("nvarchar(36)");
 
                     b.Property<string>("CategoryId")
                         .HasColumnType("nvarchar(36)");
@@ -653,7 +657,7 @@ namespace SnapRoom.Repositories.Migrations
 
                     b.HasOne("SnapRoom.Contract.Repositories.Entities.Product", "Product")
                         .WithMany("ProductCategories")
-                        .HasForeignKey("CategoryId")
+                        .HasForeignKey("ProductId")
                         .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired();
 

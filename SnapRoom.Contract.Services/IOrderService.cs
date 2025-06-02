@@ -5,6 +5,7 @@ namespace SnapRoom.Contract.Services
 {
 	public interface IOrderService
 	{
+		Task<BasePaginatedList<object>> GetOrders(string? customerId, string? designerId, int pageNumber, int pageSize);
 		Task<BasePaginatedList<object>> GetOrdersForCustomer(int pageNumber, int pageSize);
 		Task<BasePaginatedList<object>> GetOrdersForDesigner(int pageNumber, int pageSize);
 		Task<object> GetOrderById(string id);

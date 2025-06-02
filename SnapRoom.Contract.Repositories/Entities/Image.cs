@@ -10,5 +10,6 @@ namespace SnapRoom.Contract.Repositories.Entities
 		public virtual Account? Account { get; set; }
 		public string? ProductId { get; set; }
 		public virtual Product? Product { get; set; }
+		public bool IsPrimary { get; set; } = false;
 	}
 }

@@ -12,8 +12,8 @@ using SnapRoom.Repositories.DatabaseContext;
 namespace SnapRoom.Repositories.Migrations
 {
     [DbContext(typeof(SnapRoomDbContext))]
-    [Migration("20250601030156_addactive")]
-    partial class addactive
+    [Migration("20250602143353_primaryimageadd")]
+    partial class primaryimageadd
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -174,6 +174,9 @@ namespace SnapRoom.Repositories.Migrations
                 {
                     b.Property<string>("ImageSource")
                         .HasColumnType("nvarchar(450)");
+
+                    b.Property<bool>("IsPrimary")
+                        .HasColumnType("bit");
 
                     b.Property<string>("ProductId")
                         .HasColumnType("nvarchar(36)");
@@ -373,6 +376,10 @@ namespace SnapRoom.Repositories.Migrations
                     b.Property<DateTimeOffset?>("DeletedTime")
                         .HasColumnType("datetimeoffset");
 
+                    b.Property<string>("Description")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<string>("DesignerId")
                         .HasColumnType("nvarchar(36)");
 
@@ -407,7 +414,7 @@ namespace SnapRoom.Repositories.Migrations
             modelBuilder.Entity("SnapRoom.Contract.Repositories.Entities.ProductCategory", b =>
                 {
                     b.Property<string>("ProductId")
-                        .HasColumnType("nvarchar(450)");
+                        .HasColumnType("nvarchar(36)");
 
                     b.Property<string>("CategoryId")
                         .HasColumnType("nvarchar(36)");
@@ -448,24 +455,6 @@ namespace SnapRoom.Repositories.Migrations
                 {
                     b.Property<string>("Id")
                         .HasColumnType("nvarchar(36)");
-
-                    b.Property<string>("CreatedBy")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<DateTimeOffset>("CreatedTime")
-                        .HasColumnType("datetimeoffset");
-
-                    b.Property<string>("DeletedBy")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<DateTimeOffset?>("DeletedTime")
-                        .HasColumnType("datetimeoffset");
-
-                    b.Property<string>("LastUpdatedBy")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<DateTimeOffset>("LastUpdatedTime")
-                        .HasColumnType("datetimeoffset");
 
                     b.Property<string>("Name")
                         .IsRequired()
@@ -653,7 +642,7 @@ namespace SnapRoom.Repositories.Migrations
 
                     b.HasOne("SnapRoom.Contract.Repositories.Entities.Product", "Product")
                         .WithMany("ProductCategories")
-                        .HasForeignKey("CategoryId")
+                        .HasForeignKey("ProductId")
                         .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired();
 

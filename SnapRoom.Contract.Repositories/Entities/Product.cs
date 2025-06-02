@@ -7,8 +7,9 @@ namespace SnapRoom.Contract.Repositories.Entities
 		public string Name { get; set; } = default!;
 		public decimal Price { get; set; }
 		public double Rating { get; set; } = 0;
+		public string Description { get; set; } = default!;
 		public bool Active { get; set; } = true;
-
+		
 		public string? DesignerId { get; set; }
 		public virtual Account? Designer { get; set; }
 		public string? ParentDesignId { get; set; }

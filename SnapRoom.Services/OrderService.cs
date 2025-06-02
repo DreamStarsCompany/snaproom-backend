@@ -24,7 +24,7 @@ namespace SnapRoom.Services
 			_authenticationService = authenticationService;
 		}
 
-		private async Task<BasePaginatedList<object>> GetOrders(string? customerId, string? designerId, int pageNumber, int pageSize)
+		public async Task<BasePaginatedList<object>> GetOrders(string? customerId, string? designerId, int pageNumber, int pageSize)
 		{
 			List<Order> query = await _unitOfWork.GetRepository<Order>().Entities
 				.Where(o => (string.IsNullOrWhiteSpace(customerId) || o.CustomerId == customerId) && (string.IsNullOrWhiteSpace(designerId) || o.DesignerId == designerId) && !o.IsCart).ToListAsync();
@@ -33,7 +33,7 @@ namespace SnapRoom.Services
 			{
 				x.Id,
 				x.OrderPrice,
-				Customer = new { x.Customer.Name },
+				Customer = new { x.Customer?.Name },
 				Designer = new { x.Designer?.Name },
 				Date = _unitOfWork.GetRepository<TrackingStatus>().Entities.FirstOrDefault(t => t.OrderId == x.Id && t.Status.Name == "Processing")?.Time,
 				Status = _unitOfWork.GetRepository<TrackingStatus>().Entities.Where(t => t.OrderId == x.Id).OrderByDescending(t => t.Time).FirstOrDefault()?.Status.Name,
@@ -149,7 +149,7 @@ namespace SnapRoom.Services
 
 			if (customer == null)
 			{
-				throw new ErrorException(404, "", "Tài khoản không tồn tại");
+				throw new ErrorException(404, "", "Tài khoản không hợp lệ");
 			}
 
 			Product? product = await _unitOfWork.GetRepository<Product>().Entities

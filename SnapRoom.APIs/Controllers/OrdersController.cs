@@ -3,7 +3,6 @@ using SnapRoom.Common.Base;
 using SnapRoom.Common.Enum;
 using SnapRoom.Contract.Repositories.Dtos.OrderDtos;
 using SnapRoom.Contract.Services;
-using SnapRoom.Services;
 
 namespace SnapRoom.APIs.Controllers
 {
@@ -16,6 +15,19 @@ namespace SnapRoom.APIs.Controllers
 		{
 			_orderService = orderService;
 		}
+
+		[HttpGet]
+		public async Task<IActionResult> GetOrders(int pageNumber = -1, int pageSize = -1)
+		{
+			var orders = await _orderService.GetOrders(null, null, pageNumber, pageSize);
+
+			return Ok(new BaseResponse<object>(
+				statusCode: StatusCodeEnum.OK,
+				message: "Lấy đơn hàng thành công",
+				data: orders
+			));
+		}
+
 
 		[HttpGet("customer")]
 		public async Task<IActionResult> GetOrdersForCustomer(int pageNumber = -1, int pageSize = -1)

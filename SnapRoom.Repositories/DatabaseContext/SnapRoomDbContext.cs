@@ -70,7 +70,7 @@ namespace SnapRoom.Repositories.DatabaseContext
 			modelBuilder.Entity<Product>()
 				.HasMany(p => p.Images).WithOne(i => i.Product).HasForeignKey(i => i.ProductId).OnDelete(DeleteBehavior.NoAction);
 			modelBuilder.Entity<Product>()
-				.HasMany(p => p.ProductCategories).WithOne(c => c.Product).HasForeignKey(c => c.CategoryId).OnDelete(DeleteBehavior.NoAction);
+				.HasMany(p => p.ProductCategories).WithOne(c => c.Product).HasForeignKey(c => c.ProductId).OnDelete(DeleteBehavior.NoAction);
 			modelBuilder.Entity<Product>()
 				.HasOne(p => p.Design).WithOne(d => d.Product).HasForeignKey<Design>(d => d.Id).OnDelete(DeleteBehavior.NoAction);
 			modelBuilder.Entity<Product>()
