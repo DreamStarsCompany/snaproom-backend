@@ -15,13 +15,13 @@ namespace SnapRoom.Services
 	{
 		private readonly IUnitOfWork _unitOfWork;
 		private readonly IMapper _mapper;
-		private readonly IAuthService _authenticationService;
+		private readonly IAuthService _authService;
 
 		public ProductService(IUnitOfWork unitOfWork, IMapper mapper, IAuthService authenticationService)
 		{
 			_unitOfWork = unitOfWork;
 			_mapper = mapper;
-			_authenticationService = authenticationService;
+			_authService = authenticationService;
 		}
 
 		public async Task<BasePaginatedList<object>> GetDesigns(int pageNumber, int pageSize)
@@ -50,6 +50,41 @@ namespace SnapRoom.Services
 			return new BasePaginatedList<object>(responseItems, query.Count, pageNumber, pageSize);
 		}
 
+		public async Task<BasePaginatedList<object>> GetDesignsForDesigner(int pageNumber, int pageSize)
+		{
+			string designerId = _authService.GetCurrentAccountId();
+
+			Account? designer = await _unitOfWork.GetRepository<Account>().Entities.Where(a => a.Id == designerId && a.Role == RoleEnum.Designer && a.DeletedBy == null).FirstOrDefaultAsync();
+
+			if (designer == null)
+			{
+				throw new ErrorException(404, "", "Tài khoản không hợp lệ");
+			}
+
+			List<Product> query = await _unitOfWork.GetRepository<Product>().Entities
+				.Where(p => p.Design != null && p.DesignerId == designerId).ToListAsync();
+
+			var responseItems = query.Select(x => new
+			{
+				x.Id,
+				x.Name,
+				x.Description,
+				x.Rating,
+				x.Price,
+				PrimaryImage = new { x.Images?.FirstOrDefault(img => img.IsPrimary)?.ImageSource },
+				Categories = x.ProductCategories?.Select(pc => new
+				{
+					Id = pc.CategoryId,
+					Name = _unitOfWork.GetRepository<Category>().Entities
+						.Where(c => c.Id == pc.CategoryId)
+						.Select(c => c.Name).FirstOrDefault()
+				}).ToList(),
+			}).ToList();
+
+			return new BasePaginatedList<object>(responseItems, query.Count, pageNumber, pageSize);
+		}
+
+
 		public async Task<BasePaginatedList<object>> GetFurnitures(int pageNumber, int pageSize)
 		{
 
@@ -77,9 +112,47 @@ namespace SnapRoom.Services
 			return new BasePaginatedList<object>(responseItems, query.Count, pageNumber, pageSize);
 		}
 
+		public async Task<BasePaginatedList<object>> GetFurnituresForDesigner(int pageNumber, int pageSize)
+		{
+
+			string designerId = _authService.GetCurrentAccountId();
+
+			Account? designer = await _unitOfWork.GetRepository<Account>().Entities.Where(a => a.Id == designerId && a.Role == RoleEnum.Designer && a.DeletedBy == null).FirstOrDefaultAsync();
+
+			if (designer == null)
+			{
+				throw new ErrorException(404, "", "Tài khoản không hợp lệ");
+			}
+
+			List<Product> query = await _unitOfWork.GetRepository<Product>().Entities
+				.Where(p => p.Furniture != null && p.DesignerId == designerId).ToListAsync();
+			 
+
+			var responseItems = query.Select(x => new
+			{
+				x.Id,
+				x.Name,
+				x.Description,
+				x.Rating,
+				x.Price,
+				PrimaryImage = new { x.Images?.FirstOrDefault(img => img.IsPrimary)?.ImageSource },
+				Categories = x.ProductCategories?.Select(pc => new
+				{
+					Id = pc.CategoryId,
+					Name = _unitOfWork.GetRepository<Category>().Entities
+						.Where(c => c.Id == pc.CategoryId)
+						.Select(c => c.Name).FirstOrDefault()
+				}).ToList(),
+
+			}).ToList();
+
+			return new BasePaginatedList<object>(responseItems, query.Count, pageNumber, pageSize);
+		}
+
+
 		public async Task CreateDesign(DesignCreateDto dto)
 		{
-			string designerId = _authenticationService.GetCurrentAccountId();
+			string designerId = _authService.GetCurrentAccountId();
 
 			Account? designer = await _unitOfWork.GetRepository<Account>().Entities
 				.Where(a => a.Id == designerId && a.Role == RoleEnum.Designer)

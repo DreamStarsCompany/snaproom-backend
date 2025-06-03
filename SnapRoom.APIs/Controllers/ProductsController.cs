@@ -29,6 +29,19 @@ namespace SnapRoom.APIs.Controllers
 			));
 		}
 
+		[HttpGet("designer/designs")]
+		public async Task<IActionResult> GetDesignsForDesigner(int pageNumber = -1, int pageSize = -1)
+		{
+			var products = await _productService.GetDesignsForDesigner(pageNumber, pageSize);
+
+			return Ok(new BaseResponse<object>(
+				statusCode: StatusCodeEnum.OK,
+				message: "Lấy sản phẩm thành công",
+				data: products
+			));
+		}
+
+
 		[HttpGet("furnitures")]
 		public async Task<IActionResult> GetFurnitures(int pageNumber = -1, int pageSize = -1)
 		{
@@ -40,6 +53,19 @@ namespace SnapRoom.APIs.Controllers
 				data: products
 			));
 		}
+
+		[HttpGet("designer/furnitures")]
+		public async Task<IActionResult> GetFurnituresForDesigner(int pageNumber = -1, int pageSize = -1)
+		{
+			var products = await _productService.GetFurnituresForDesigner(pageNumber, pageSize);
+
+			return Ok(new BaseResponse<object>(
+				statusCode: StatusCodeEnum.OK,
+				message: "Lấy sản phẩm thành công",
+				data: products
+			));
+		}
+
 
 		[HttpPost("designs")]
 		public async Task<IActionResult> CreateDesign(DesignCreateDto dto)

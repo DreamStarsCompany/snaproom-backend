@@ -54,7 +54,7 @@ namespace SnapRoom.APIs.Controllers
 		}
 
 		[HttpPost("designer/register")]
-		public async Task<IActionResult> DesignerRegister(RegisterDto registerDto)
+		public async Task<IActionResult> DesignerRegister(DesignerRegisterDto registerDto)
 		{
 			await _authService.DesignerRegister(registerDto);
 

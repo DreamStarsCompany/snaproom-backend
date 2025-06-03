@@ -8,6 +8,9 @@ namespace SnapRoom.Contract.Services
 	{
 		Task<BasePaginatedList<object>> GetFurnitures(int pageNumber, int pageSize);
 		Task<BasePaginatedList<object>> GetDesigns(int pageNumber, int pageSize);
+		Task<BasePaginatedList<object>> GetFurnituresForDesigner(int pageNumber, int pageSize);
+		Task<BasePaginatedList<object>> GetDesignsForDesigner(int pageNumber, int pageSize);
+
 		Task CreateDesign(DesignCreateDto dto);
 	}
 }

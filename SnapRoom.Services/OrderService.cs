@@ -15,13 +15,13 @@ namespace SnapRoom.Services
 	{
 		private readonly IUnitOfWork _unitOfWork;
 		private readonly IMapper _mapper;
-		private readonly IAuthService _authenticationService;
+		private readonly IAuthService _authService;
 
-		public OrderService(IUnitOfWork unitOfWork, IMapper mapper, IAuthService authenticationService)
+		public OrderService(IUnitOfWork unitOfWork, IMapper mapper, IAuthService authService)
 		{
 			_unitOfWork = unitOfWork;
 			_mapper = mapper;
-			_authenticationService = authenticationService;
+			_authService = authService;
 		}
 
 		public async Task<BasePaginatedList<object>> GetOrders(string? customerId, string? designerId, int pageNumber, int pageSize)
@@ -44,7 +44,7 @@ namespace SnapRoom.Services
 
 		public async Task<BasePaginatedList<object>> GetOrdersForCustomer(int pageNumber, int pageSize)
 		{
-			string customerId = _authenticationService.GetCurrentAccountId();
+			string customerId = _authService.GetCurrentAccountId();
 
 			Account? customer = await _unitOfWork.GetRepository<Account>().Entities
 				.Where(a => a.Id == customerId && a.Role == RoleEnum.Customer).FirstOrDefaultAsync();
@@ -59,7 +59,7 @@ namespace SnapRoom.Services
 
 		public async Task<BasePaginatedList<object>> GetOrdersForDesigner(int pageNumber, int pageSize)
 		{
-			string designerId = _authenticationService.GetCurrentAccountId();
+			string designerId = _authService.GetCurrentAccountId();
 
 			Account? designer = await _unitOfWork.GetRepository<Account>().Entities
 				.Where(a => a.Id == designerId && a.Role == RoleEnum.Designer).FirstOrDefaultAsync();
@@ -107,7 +107,7 @@ namespace SnapRoom.Services
 
 		public async Task<object> GetCart()
 		{
-			string customerId = _authenticationService.GetCurrentAccountId();
+			string customerId = _authService.GetCurrentAccountId();
 
 			Account? customer = await _unitOfWork.GetRepository<Account>().Entities
 				.Where(a => a.Id == customerId && a.Role == RoleEnum.Customer).FirstOrDefaultAsync();
@@ -142,7 +142,7 @@ namespace SnapRoom.Services
 
 		public async Task AddToCart(CartItemDto dto)
 		{
-			string customerId = _authenticationService.GetCurrentAccountId();
+			string customerId = _authService.GetCurrentAccountId();
 
 			Account? customer = await _unitOfWork.GetRepository<Account>().Entities
 				.Where(a => a.Id == customerId && a.Role == RoleEnum.Customer).FirstOrDefaultAsync();
@@ -216,7 +216,7 @@ namespace SnapRoom.Services
 
 		public async Task DeleteFromCart(string productId)
 		{
-			string customerId = _authenticationService.GetCurrentAccountId();
+			string customerId = _authService.GetCurrentAccountId();
 
 			// Fetch cart of the customer
 			Order? cart = await _unitOfWork.GetRepository<Order>().Entities
