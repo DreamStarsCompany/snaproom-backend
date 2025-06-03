@@ -125,11 +125,11 @@ namespace SnapRoom.Services
 			await _mailService.SendVerificationMail(newCustomer);
 		}
 
-		public async Task DesignerRegister(RegisterDto registerDto)
+		public async Task DesignerRegister(DesignerRegisterDto dto)
 		{
 			// Check if the user already exists
 			var existingDesigner = await _unitOfWork.GetRepository<Account>().Entities
-				.Where(a => a.Email == registerDto.Email && a.DeletedBy == null & a.Role == RoleEnum.Designer)
+				.Where(a => a.Email == dto.Email && a.DeletedBy == null & a.Role == RoleEnum.Designer)
 				.FirstOrDefaultAsync();
 			if (existingDesigner != null)
 			{
@@ -137,14 +137,15 @@ namespace SnapRoom.Services
 			}
 
 			// Hash the password
-			var hashedPassword = BCrypt.Net.BCrypt.HashPassword(registerDto.Password);
+			var hashedPassword = BCrypt.Net.BCrypt.HashPassword(dto.Password);
 
 			// Create new user entity
 			Account newDesigner = new()
 			{
-				Name = registerDto.Name,
+				Name = dto.Name,
 				Password = hashedPassword,
-				Email = registerDto.Email,
+				Email = dto.Email,
+				ApplicationUrl = dto.ApplicattionUrl,
 				Role = RoleEnum.Designer,
 				VerificationToken = Guid.NewGuid().ToString()
 			};

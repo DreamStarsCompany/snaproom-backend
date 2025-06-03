@@ -6,7 +6,7 @@ using SnapRoom.Contract.Services;
 
 namespace SnapRoom.APIs.Controllers
 {
-	[Route("api/[controller]")]
+	[Route("api")]
 	[ApiController]
 	public class OrdersController : ControllerBase
 	{
@@ -16,7 +16,7 @@ namespace SnapRoom.APIs.Controllers
 			_orderService = orderService;
 		}
 
-		[HttpGet]
+		[HttpGet("orders")]
 		public async Task<IActionResult> GetOrders(int pageNumber = -1, int pageSize = -1)
 		{
 			var orders = await _orderService.GetOrders(null, null, pageNumber, pageSize);
@@ -29,7 +29,7 @@ namespace SnapRoom.APIs.Controllers
 		}
 
 
-		[HttpGet("customer")]
+		[HttpGet("customer/orders")]
 		public async Task<IActionResult> GetOrdersForCustomer(int pageNumber = -1, int pageSize = -1)
 		{
 			var orders = await _orderService.GetOrdersForCustomer(pageNumber, pageSize);
@@ -41,7 +41,7 @@ namespace SnapRoom.APIs.Controllers
 			));
 		}
 
-		[HttpGet("designer")]
+		[HttpGet("designer/orders")]
 		public async Task<IActionResult> GetOrdersForDesigner(int pageNumber = -1, int pageSize = -1)
 		{
 			var orders = await _orderService.GetOrdersForDesigner(pageNumber, pageSize);
@@ -54,7 +54,7 @@ namespace SnapRoom.APIs.Controllers
 		}
 
 
-		[HttpGet("{id}")]
+		[HttpGet("orders/{id}")]
 		public async Task<IActionResult> GetOrderById(string id)
 		{
 			var order = await _orderService.GetOrderById(id);

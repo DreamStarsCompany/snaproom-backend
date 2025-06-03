@@ -6,7 +6,7 @@ using SnapRoom.Contract.Services;
 
 namespace SnapRoom.APIs.Controllers
 {
-	[Route("api/[controller]")]
+	[Route("api")]
 	[ApiController]
 	public class ProductsController : ControllerBase
 	{

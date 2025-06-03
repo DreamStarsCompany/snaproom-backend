@@ -11,6 +11,7 @@ namespace SnapRoom.Contract.Repositories.Entities
 		public string? Profession { get; set; }
 		public string? ContactNumber { get; set; }
 		public RoleEnum Role { get; set; }
+		public string? ApplicationUrl { get; set; }
 		public string? VerificationToken { get; set; }
 		public string? ResetPasswordToken { get; set; }
 
