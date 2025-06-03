@@ -10,11 +10,17 @@ namespace SnapRoom.APIs.Controllers
 	[ApiController]
 	public class ImagesController : ControllerBase
 	{
+		private readonly IConfiguration _config;
+		public ImagesController(IConfiguration config)
+		{
+			_config = config;
+		}
+
 		[HttpPost("upload")]
 		public async Task<IActionResult> UploadImage(IFormFile imageFile)
 		{
 
-			string connectionString = "DefaultEndpointsProtocol=https;AccountName=dataimage;AccountKey=EculdS+KG3G0NWHbDqcJAzjmR/6xeXXawureAr8j/SEOdvyv2tjdEvckOuaHYeRFh73MDoixrLHD+ASts0Eudw==;EndpointSuffix=core.windows.net";
+			string connectionString = _config["BlobContainer"]!;
 			string containerName = "snaproom";  // Your blob container name
 
 			var blobServiceClient = new BlobServiceClient(connectionString);
