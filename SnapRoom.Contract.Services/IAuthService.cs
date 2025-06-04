@@ -9,6 +9,7 @@ namespace SnapRoom.Contract.Services
 		Task<string> DesignerLogin(LoginDto loginDto);
 		Task CustomerRegister(RegisterDto registerDto);
 		Task DesignerRegister(DesignerRegisterDto registerDto);
+		Task SendApplicationResultEmail(string email, bool isApproved);
 		Task VerifyAccount(string token);
 		Task ForgetPassword(string email);
 		Task VerifyResetPassowrd(string token);

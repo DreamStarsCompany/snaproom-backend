@@ -78,7 +78,7 @@ namespace SnapRoom.APIs
 			services.AddDbContext<SnapRoomDbContext>(options =>
 			{
 				options.UseLazyLoadingProxies() // Enable lazy loading
-					   .UseSqlServer(configuration.GetConnectionString("MyCnn")); // Đổi API -> Repositories
+					   .UseSqlServer(configuration.GetConnectionString("Database")); // Đổi API -> Repositories
 				options.ConfigureWarnings(warnings => warnings.Ignore(RelationalEventId.PendingModelChangesWarning));
 			});
 		}

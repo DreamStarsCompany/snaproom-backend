@@ -73,6 +73,18 @@ namespace SnapRoom.APIs.Controllers
 			return Redirect("https://www.google.com/");
 		}
 
+		[HttpPost("application-result")]
+		public async Task<IActionResult> VerifyAccount(string email, bool isApproved = true)
+		{
+			await _authService.SendApplicationResultEmail(email, isApproved);
+
+			return Ok(new BaseResponse<object>(
+				statusCode: StatusCodeEnum.OK,
+				message: "Xét duyệt thành công",
+				data: null
+			));
+		}
+
 
 	}
 }

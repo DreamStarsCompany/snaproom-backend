@@ -1,13 +1,8 @@
 ﻿using Microsoft.Extensions.Configuration;
 using SnapRoom.Common.Enum;
 using SnapRoom.Contract.Repositories.Entities;
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Net;
 using System.Net.Mail;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace SnapRoom.Services
 {
@@ -34,13 +29,13 @@ namespace SnapRoom.Services
 			string backendUrl = _confg["BACKEND_URL"]!;
 
 			string verificationUrl = $"{backendUrl}/api/auth/verify-account?token={account.VerificationToken}";
-			string message = "";
+			string body = "";
 			string imageUrl = "https://dataimage.blob.core.windows.net/snaproom/app-banner.png";
 
 
 			if (account.Role == RoleEnum.Customer)
 			{
-				message = $@"
+				body = $@"
 					<div style='font-family: Arial, sans-serif; line-height: 1.5;'>
 						<div style='text-align: center; margin-bottom: 20px;'>
 							<img src='{imageUrl}' alt='SnapRoom Banner' style='max-width: 100%; height: auto;' />
@@ -66,27 +61,25 @@ namespace SnapRoom.Services
 			}
 			else
 			{
-				message = $@"
+				body = $@"
 					<div style='font-family: Arial, sans-serif; line-height: 1.5;'>
 						<div style='text-align: center; margin-bottom: 20px;'>
 							<img src='{imageUrl}' alt='SnapRoom Banner' style='max-width: 100%; height: auto;' />
 						</div>
 
-						<p>Chào mừng bạn đến với <strong>SnapRoom</strong>! Cảm ơn bạn đã đăng ký trở thành <strong>nhà thiết kế</strong> của chúng tôi. Để hoàn tất quá trình tạo tài khoản, vui lòng xác minh email bằng cách nhấn vào nút bên dưới:</p>
+						<p>Chào mừng bạn đến với <strong>SnapRoom</strong>!</p>
 
-						<p style='text-align: center;'>
-							<a href='{verificationUrl}' 
-							   style='display: inline-block; padding: 10px 15px; background-color: #2196F3; color: white;
-									  text-decoration: none; border-radius: 5px; font-weight: bold;'>
-								🔗 Xác minh email của bạn
-							</a>
-						</p>
+						<p>Chúng tôi đã nhận được yêu cầu đăng ký tài khoản <strong>nhà thiết kế</strong> cùng với hồ sơ cá nhân của bạn.</p>
 
-						<p>Liên kết này sẽ hết hạn sau <strong>15 phút</strong>. Vui lòng hoàn tất xác minh để bắt đầu chia sẻ những thiết kế tuyệt vời của bạn.</p>
+						<p>Hiện tại, hồ sơ của bạn đang trong quá trình <strong>xét duyệt</strong> bởi đội ngũ kiểm duyệt của SnapRoom. Chúng tôi sẽ đánh giá các thông tin và đường dẫn hồ sơ bạn cung cấp để đảm bảo chất lượng và phù hợp với tiêu chí cộng đồng.</p>
 
-						<p>Nếu bạn không gửi yêu cầu tạo tài khoản, vui lòng bỏ qua email này.</p>
+						<p>Sau khi hoàn tất quá trình xét duyệt, bạn sẽ nhận được một email thông báo về kết quả đăng ký. Nếu được chấp thuận, bạn sẽ có thể truy cập vào tài khoản và bắt đầu chia sẻ các thiết kế của mình trên nền tảng SnapRoom.</p>
 
-						<p>Thân ái,<br><strong>Đội ngũ SnapRoom</strong></p>
+						<p><strong>Lưu ý:</strong> Quá trình xét duyệt có thể mất đến <strong>24–48 giờ</strong>.</p>
+
+						<p>Chân thành cảm ơn bạn đã quan tâm và mong muốn trở thành một phần của cộng đồng thiết kế SnapRoom.</p>
+
+						<p>Trân trọng,<br><strong>Đội ngũ SnapRoom</strong></p>
 					</div>";
 			}
 
@@ -94,7 +87,7 @@ namespace SnapRoom.Services
 			{
 				From = new MailAddress(mail),
 				Subject = "Xác minh tài khoản SnapRoom",
-				Body = message,
+				Body = body,
 				IsBodyHtml = true
 			};
 
@@ -119,7 +112,7 @@ namespace SnapRoom.Services
 			var backendUrl = _confg["BACKEND_URL"];
 			string resetUrl = $"{backendUrl}/api/authentication/verify-reset-password?token={resetToken}";
 
-			var message = $@"
+			var body = $@"
 				<div style='font-family: Arial, sans-serif; line-height: 1.5;'>
 					<p>Chúng tôi nhận được yêu cầu khôi phục mật khẩu cho tài khoản của bạn tại <strong>Kids Vaccine</strong>. Nếu bạn đã yêu cầu điều này, vui lòng nhấn vào nút bên dưới để đặt lại mật khẩu:</p>
 
@@ -142,7 +135,7 @@ namespace SnapRoom.Services
 			{
 				From = new MailAddress(mail),
 				Subject = "Xác minh tài khoản Kids Vaccine",
-				Body = message,
+				Body = body,
 				IsBodyHtml = true
 			};
 
@@ -167,7 +160,7 @@ namespace SnapRoom.Services
 			var backendUrl = _confg["BACKEND_URL"];
 			string updateEmailUrl = $"{backendUrl}/api/authentication/verify-reset-password?token={otp}";
 
-			var message = $@"
+			var body = $@"
 				<div style='font-family: Arial, sans-serif; line-height: 1.5;'>
 					<p>Bạn đã yêu cầu thay đổi địa chỉ email cho tài khoản của mình tại <strong>Kids Vaccine</strong>.</p>
 
@@ -188,12 +181,66 @@ namespace SnapRoom.Services
 			{
 				From = new MailAddress(mail),
 				Subject = "Xác minh tài khoản Kids Vaccine",
-				Body = message,
+				Body = body,
 				IsBodyHtml = true
 			};
 
 			// Thêm người nhận
 			mailMessage.To.Add(newEmail);
+
+			// Gửi email
+			return client.SendMailAsync(mailMessage);
+
+		}
+
+		public Task SendApplicationResultMail(string email, bool isApproved)
+		{
+			var mail = "kidsvaccinecorp@gmail.com";
+			var pw = "swdg enlv vfrk rpdf";
+
+			var client = new SmtpClient("smtp.gmail.com", 587)
+			{
+				EnableSsl = true,
+				Credentials = new NetworkCredential(mail, pw)
+			};
+
+
+			var body = "";
+
+			if (isApproved)
+			{
+				body = @"
+					<div style='font-family: Arial, sans-serif; line-height: 1.5;'>
+						<h2>🎉 Chúc mừng!</h2>
+						<p>Bạn đã được <strong>chấp thuận</strong> trở thành <strong>nhà thiết kế</strong> tại SnapRoom.</p>
+						<p>Bạn có thể đăng nhập và bắt đầu chia sẻ những thiết kế tuyệt vời của mình ngay bây giờ.</p>
+						<p>Chúng tôi rất mong được hợp tác cùng bạn.</p>
+						<p>Thân ái,<br><strong>Đội ngũ SnapRoom</strong></p>
+					</div>";
+			}
+			else
+			{
+				body = @"
+					<div style='font-family: Arial, sans-serif; line-height: 1.5;'>
+						<h2>🛑 Rất tiếc!</h2>
+						<p>Sau khi xem xét hồ sơ của bạn, chúng tôi rất tiếc phải thông báo rằng yêu cầu đăng ký tài khoản <strong>nhà thiết kế</strong> tại SnapRoom đã <strong>không được chấp nhận</strong>.</p>
+						<p>Bạn có thể xem xét và cập nhật lại hồ sơ của mình và thử lại sau.</p>
+						<p>Chúng tôi trân trọng sự quan tâm của bạn đến nền tảng của chúng tôi.</p>
+						<p>Thân ái,<br><strong>Đội ngũ SnapRoom</strong></p>
+					</div>";
+			}
+
+
+			var mailMessage = new MailMessage
+			{
+				From = new MailAddress(mail),
+				Subject = "Xác minh tài khoản SnapRoom",
+				Body = body,
+				IsBodyHtml = true
+			};
+
+			// Thêm người nhận
+			mailMessage.To.Add(email);
 
 			// Gửi email
 			return client.SendMailAsync(mailMessage);

@@ -18,8 +18,7 @@ namespace SnapRoom.Repositories.DatabaseContext
 					.Build();
 
 				var builder = new DbContextOptionsBuilder<SnapRoomDbContext>();
-				var connectionString = configuration.GetConnectionString("MyCnn");
-
+				var connectionString = configuration.GetConnectionString("Database");
 				builder.UseSqlServer(connectionString);
 
 				return new SnapRoomDbContext(builder.Options);

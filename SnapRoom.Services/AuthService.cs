@@ -53,13 +53,13 @@ namespace SnapRoom.Services
 			throw new NotImplementedException();
 		}
 
-		public async Task<string> CustomerLogin(LoginDto loginDto)
+		public async Task<string> CustomerLogin(LoginDto dto)
 		{
 			Account? account = await _unitOfWork.GetRepository<Account>().Entities
-				.Where(a => a.Email == loginDto.Email && a.DeletedBy == null && a.Role == RoleEnum.Customer)
+				.Where(a => a.Email == dto.Email && a.DeletedBy == null && a.Role == RoleEnum.Customer)
 				.FirstOrDefaultAsync();
 
-			if (account == null || !BCrypt.Net.BCrypt.Verify(loginDto.Password, account.Password))
+			if (account == null || !BCrypt.Net.BCrypt.Verify(dto.Password, account.Password))
 			{
 				throw new ErrorException(401, "unauthorized", "Sai mật khẩu hoặc tài khoản");
 			}
@@ -73,13 +73,13 @@ namespace SnapRoom.Services
 			return GenerateJwtToken(account);
 		}
 
-		public async Task<string> DesignerLogin(LoginDto loginDto)
+		public async Task<string> DesignerLogin(LoginDto dto)
 		{
 			Account? account = await _unitOfWork.GetRepository<Account>().Entities
-				.Where(a => a.Email == loginDto.Email && a.DeletedBy == null && (a.Role == RoleEnum.Designer || a.Role == RoleEnum.Admin))
+				.Where(a => a.Email == dto.Email && a.DeletedBy == null && (a.Role == RoleEnum.Designer || a.Role == RoleEnum.Admin))
 				.FirstOrDefaultAsync();
 
-			if (account == null || !BCrypt.Net.BCrypt.Verify(loginDto.Password, account.Password))
+			if (account == null || !BCrypt.Net.BCrypt.Verify(dto.Password, account.Password))
 			{
 				throw new ErrorException(401, "unauthorized", "Sai mật khẩu hoặc tài khoản");
 			}
@@ -145,7 +145,7 @@ namespace SnapRoom.Services
 				Name = dto.Name,
 				Password = hashedPassword,
 				Email = dto.Email,
-				ApplicationUrl = dto.ApplicattionUrl,
+				ApplicationUrl = dto.ApplicationUrl,
 				Role = RoleEnum.Designer,
 				VerificationToken = Guid.NewGuid().ToString()
 			};
@@ -155,6 +155,26 @@ namespace SnapRoom.Services
 			await _unitOfWork.SaveAsync();
 
 			await _mailService.SendVerificationMail(newDesigner);
+
+		}
+
+		public async Task SendApplicationResultEmail(string email, bool isApproved)
+		{
+			Account designer = _unitOfWork.GetRepository<Account>().Entities
+				.Where(a => a.Email == email && a.DeletedBy == null && a.Role == RoleEnum.Designer && a.VerificationToken != null)
+				.FirstOrDefault() ?? throw new ErrorException(404, "not_found", "Email không hợp lệ");
+
+			if (isApproved)
+			{
+				designer.VerificationToken = null; // Approve the designer by removing the verification token
+			}
+			else
+			{
+				_unitOfWork.GetRepository<Account>().Delete(designer);
+			}
+			await _unitOfWork.SaveAsync();
+
+			await _mailService.SendApplicationResultMail(email, isApproved);
 
 		}
 

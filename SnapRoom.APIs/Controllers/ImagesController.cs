@@ -20,7 +20,7 @@ namespace SnapRoom.APIs.Controllers
 		public async Task<IActionResult> UploadImage(IFormFile imageFile)
 		{
 
-			string connectionString = _config["BlobContainer"]!;
+			string connectionString = _config.GetConnectionString("BlobContainer")!;
 			string containerName = "snaproom";  // Your blob container name
 
 			var blobServiceClient = new BlobServiceClient(connectionString);
