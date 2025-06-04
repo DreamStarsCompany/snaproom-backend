@@ -126,7 +126,7 @@ namespace SnapRoom.Services
 
 			List<Product> query = await _unitOfWork.GetRepository<Product>().Entities
 				.Where(p => p.Furniture != null && p.DesignerId == designerId).ToListAsync();
-			 
+
 
 			var responseItems = query.Select(x => new
 			{
@@ -213,5 +213,146 @@ namespace SnapRoom.Services
 			await _unitOfWork.GetRepository<Product>().InsertAsync(design);
 			await _unitOfWork.SaveAsync();
 		}
+
+		public async Task<object> GetProductById(string id)
+		{
+
+			Product? product = await _unitOfWork.GetRepository<Product>().Entities
+				.Where(p => p.Id == id && p.DeletedBy == null).FirstOrDefaultAsync();
+
+			if (product == null)
+			{
+				throw new ErrorException(404, "", "Mã sản phẩm không hợp lệ");
+			}
+
+			if (product.Design != null)
+			{
+				return await GetDesign(product);
+			}
+			else if (product.Furniture != null)
+			{
+				return await GetFurniture(product);
+			}
+
+			throw new ErrorException(404, "", "Sản phẩm chưa được phân loại");
+		}
+
+		private async Task<object> GetFurniture(Product product)
+		{
+			await _unitOfWork.SaveAsync();
+
+			var responseItem = new
+			{
+				product.Id,
+				product.Name,
+				product.Description,
+				product.Rating,
+				product.Price,
+				product.Active,
+				Designer = new { product.Designer?.Id, product.Designer?.Name },
+				ParentDesign = new { product.ParentDesign?.Id, product.ParentDesign?.Name },
+				PrimaryImage = new { product.Images?.FirstOrDefault(img => img.IsPrimary)?.ImageSource },
+				Images = product.Images?
+					.Where(img => !img.IsPrimary)
+					.Select(img => new { img.ImageSource})
+					.ToList(),
+				Style = product.ProductCategories?
+					.Select(pc => _unitOfWork.GetRepository<Category>().Entities
+						.Where(c => c.Id == pc.CategoryId)
+						.Select(c => new { c.Id, c.Name, c.Style })
+						.FirstOrDefault())
+					.Where(c => c != null)
+					.OrderByDescending(c => c?.Style)
+					.Select(c => new { c?.Id, c?.Name })
+					.FirstOrDefault(),
+				Categories = product.ProductCategories?
+					.Select(pc => _unitOfWork.GetRepository<Category>().Entities
+						.Where(c => c.Id == pc.CategoryId && !c.Style)
+						.Select(c => new
+						{
+							c.Id,
+							c.Name
+						})
+						.FirstOrDefault())
+					.Where(c => c != null)
+					.ToList(),
+				Reviews = product.ProductReviews?
+					.Select(pr => new
+					{
+						pr.Comment,
+						pr.Star,
+						Customer = new { pr.Customer?.Id, pr.Customer?.Name },
+						Date = pr.Time.ToString("dd/MM/yyyy")
+					})
+					.OrderByDescending(pr => pr.Date)
+					.ToList()
+			};
+
+
+			return responseItem;
+		}
+
+		private async Task<object> GetDesign(Product product)
+		{
+			await _unitOfWork.SaveAsync();
+
+			var responseItem = new
+			{
+				product.Id,
+				product.Name,
+				product.Description,
+				product.Rating,
+				product.Price,
+				product.Active,
+				Designer = new { product.Designer?.Id, product.Designer?.Name },
+				Furnitures = product.Furnitures?
+					.Select(f => new
+					{
+						f.Id,
+						f.Name,
+						PrimaryImage = new { f.Images?.FirstOrDefault(img => img.IsPrimary)?.ImageSource }
+					})
+					.ToList(),
+				PrimaryImage = new { product.Images?.FirstOrDefault(img => img.IsPrimary)?.ImageSource },
+				Images = product.Images?
+					.Where(img => !img.IsPrimary)
+					.Select(img => new { img.ImageSource })
+					.ToList(),
+				Style = product.ProductCategories?
+					.Select(pc => _unitOfWork.GetRepository<Category>().Entities
+						.Where(c => c.Id == pc.CategoryId)
+						.Select(c => new { c.Id, c.Name, c.Style })
+						.FirstOrDefault())
+					.Where(c => c != null)
+					.OrderByDescending(c => c?.Style)
+					.Select(c => new { c?.Id, c?.Name })
+					.FirstOrDefault(),
+				Categories = product.ProductCategories?
+					.Select(pc => _unitOfWork.GetRepository<Category>().Entities
+						.Where(c => c.Id == pc.CategoryId && !c.Style)
+						.Select(c => new
+						{
+							c.Id,
+							c.Name
+						})
+						.FirstOrDefault())
+					.Where(c => c != null)
+					.ToList(),
+				Reviews = product.ProductReviews?
+					.Select(pr => new
+					{
+						pr.Comment,
+						pr.Star,
+						Customer = new { pr.Customer?.Id, pr.Customer?.Name },
+						Date = pr.Time.ToString("dd/MM/yyyy")
+					})
+					.OrderByDescending(pr => pr.Date)
+					.ToList()
+			};
+
+
+			return responseItem;
+		}
+
 	}
 }

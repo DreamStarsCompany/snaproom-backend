@@ -305,7 +305,10 @@ namespace SnapRoom.Services
 				new Claim("Id", account.Id),
 				new Claim("Name", account.Name),
 				new Claim("Email", account.Email ?? ""),
-				new Claim("Role", account.Role.ToString())
+				new Claim("Role", account.Role.ToString()),
+				new Claim("PlanId", account.PlanId ?? ""),
+				new Claim("AvatarSource", account.AvatarSource ?? ""),
+				new Claim("ApplicationUrl", account.ApplicationUrl ?? "")
 			};
 
 			// Retrieve the token expiry period from configuration, handle parsing errors

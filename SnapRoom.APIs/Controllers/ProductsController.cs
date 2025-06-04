@@ -79,6 +79,16 @@ namespace SnapRoom.APIs.Controllers
 			));
 		}
 
+		[HttpGet("products/{id}")]
+		public async Task<IActionResult> GetProductById(string id)
+		{
+			var product = await _productService.GetProductById(id);
 
+			return Ok(new BaseResponse<object>(
+				statusCode: StatusCodeEnum.OK,
+				message: "Lấy sản phẩm thành công",
+				data: product
+			));
+		}
 	}
 }
