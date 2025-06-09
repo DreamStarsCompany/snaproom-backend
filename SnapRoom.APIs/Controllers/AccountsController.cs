@@ -1,5 +1,9 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using SnapRoom.Common.Base;
+using SnapRoom.Common.Enum;
+using SnapRoom.Contract.Repositories.Dtos.AccountDtos;
 using SnapRoom.Contract.Services;
+using SnapRoom.Services;
 
 namespace SnapRoom.APIs.Controllers
 {
@@ -12,6 +16,18 @@ namespace SnapRoom.APIs.Controllers
 		public AccountsController(IAccountService accountService)
 		{
 			_accountService = accountService;
+		}
+
+		[HttpGet]
+		public async Task<IActionResult> CustomerLogin(RoleEnum? role, int pageNumber, int pageSize)
+		{
+			var accounts = await _accountService.GetAccounts(role, pageNumber, pageSize);
+
+			return Ok(new BaseResponse<object>(
+				statusCode: StatusCodeEnum.OK,
+				message: "Lấy tài khoản thành công",
+				data: accounts
+			));
 		}
 
 	}

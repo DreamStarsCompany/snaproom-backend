@@ -1,5 +1,9 @@
 ﻿using AutoMapper;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
+using SnapRoom.Common.Base;
+using SnapRoom.Common.Enum;
+using SnapRoom.Contract.Repositories.Entities;
 using SnapRoom.Contract.Repositories.IUOW;
 using SnapRoom.Contract.Services;
 
@@ -19,6 +23,25 @@ namespace SnapRoom.Services
 			_mapper = mapper;
 			_authenticationService = authenticationService;
 			_config = config;
+		}
+
+		public async Task<BasePaginatedList<object>> GetAccounts(RoleEnum? role, int pageNumber, int pageSize)
+		{
+			List<Account> query = await _unitOfWork.GetRepository<Account>().Entities
+				.Where(a => (role == null || a.Role == role) && a.DeletedBy == null).ToListAsync();
+
+			var responseItems = query.Select(x => new
+			{
+				x.Id,
+				x.Name,
+				x.Email,
+				x.Profession,
+				x.ContactNumber,
+				x.Role,
+				x.ApplicationUrl
+			}).ToList();
+
+			return new BasePaginatedList<object>(responseItems, query.Count, pageNumber, pageSize);
 		}
 	}
 }

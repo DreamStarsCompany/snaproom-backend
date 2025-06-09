@@ -194,9 +194,28 @@ namespace SnapRoom.Services
 			throw new NotImplementedException();
 		}
 
-		public Task UpdatePassword(string password, string newPassword)
+		public async Task UpdatePassword(string password, string newPassword)
 		{
-			throw new NotImplementedException();
+			string accountId = GetCurrentAccountId();
+
+			Account? account = await _unitOfWork.GetRepository<Account>().Entities
+				.Where(a => a.Id == accountId && a.DeletedBy == null).FirstOrDefaultAsync();
+
+			if (account == null)
+				throw new ErrorException(401, "unauthorized", "Không tìm thấy account id.");
+
+			if (!BCrypt.Net.BCrypt.Verify(password, account.Password))
+			{
+				throw new ErrorException(401, "unauthorized", "Mật khẩu hiện tại không chính xác. Vui lòng thử lại.");
+			}
+
+			// Hash the password
+			var hashedPassword = BCrypt.Net.BCrypt.HashPassword(newPassword);
+
+			account.Password = hashedPassword;
+
+			await _unitOfWork.GetRepository<Account>().UpdateAsync(account);
+			await _unitOfWork.SaveAsync();
 		}
 
 		public async Task VerifyAccount(string token)

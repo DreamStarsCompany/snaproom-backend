@@ -85,6 +85,18 @@ namespace SnapRoom.APIs.Controllers
 			));
 		}
 
+		[HttpPost("update-password")]
+		public async Task<IActionResult> VerifyAccount(string password, string newPassword)
+		{
+			await _authService.UpdatePassword(password, newPassword);
+
+			return Ok(new BaseResponse<object>(
+				statusCode: StatusCodeEnum.OK,
+				message: "Đặt lại mật khẩu thành công",
+				data: null
+			));
+		}
+
 
 	}
 }
