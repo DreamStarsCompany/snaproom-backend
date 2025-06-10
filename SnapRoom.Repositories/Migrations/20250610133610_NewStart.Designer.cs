@@ -12,8 +12,8 @@ using SnapRoom.Repositories.DatabaseContext;
 namespace SnapRoom.Repositories.Migrations
 {
     [DbContext(typeof(SnapRoomDbContext))]
-    [Migration("20250602143353_primaryimageadd")]
-    partial class primaryimageadd
+    [Migration("20250610133610_NewStart")]
+    partial class NewStart
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -29,6 +29,9 @@ namespace SnapRoom.Repositories.Migrations
                 {
                     b.Property<string>("Id")
                         .HasColumnType("nvarchar(36)");
+
+                    b.Property<string>("ApplicationUrl")
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("AvatarSource")
                         .HasColumnType("nvarchar(450)");
