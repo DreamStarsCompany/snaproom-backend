@@ -36,9 +36,18 @@ namespace SnapRoom.Services
 			throw new NotImplementedException();
 		}
 
-		public Task ForgetPassword(string email)
+		public async Task ForgetPassword(RoleEnum role, string email)
 		{
-			throw new NotImplementedException();
+			Account? account = await _unitOfWork.GetRepository<Account>().Entities.Where(a => a.Email == email && a.Role == role && a.DeletedBy == null).FirstOrDefaultAsync();
+
+			if (account == null)
+				throw new ErrorException(401, "unauthorized", "Không tìm thấy email trong hệ thống");
+
+			account.ResetPasswordToken = Guid.NewGuid().ToString();
+
+			await _unitOfWork.GetRepository<Account>().UpdateAsync(account);
+			await _unitOfWork.SaveAsync();
+			await _mailService.SendResetPasswordEmail(email, account.ResetPasswordToken);
 		}
 
 		public string GetCurrentAccountId()
@@ -178,10 +187,20 @@ namespace SnapRoom.Services
 
 		}
 
-
-		public Task ResetPassword(string token, string newPassword)
+		public async Task ResetPassword(string token, string newPassword)
 		{
-			throw new NotImplementedException();
+			Account? account = await _unitOfWork.GetRepository<Account>().Entities
+				.Where(a => a.ResetPasswordToken == token && a.DeletedBy == null).FirstOrDefaultAsync();
+
+			if (account == null)
+				throw new ErrorException(502, "bad_gateway", "Đường dẫn đổi mật khẩu đã hết hạn, vui lòng thử lại sau");
+
+			var hashedPassword = BCrypt.Net.BCrypt.HashPassword(newPassword);
+			account.Password = hashedPassword;
+			account.ResetPasswordToken = null;
+
+			await _unitOfWork.GetRepository<Account>().UpdateAsync(account);
+			await _unitOfWork.SaveAsync();
 		}
 
 		public void UpdateAudits(BaseEntity entity, bool isCreating, bool isDeleting = false)
@@ -231,9 +250,14 @@ namespace SnapRoom.Services
 			await _unitOfWork.SaveAsync();
 		}
 
-		public Task VerifyResetPassowrd(string token)
+		public async Task VerifyResetPassowrd(string token)
 		{
-			throw new NotImplementedException();
+			Account? account = await _unitOfWork.GetRepository<Account>().Entities.Where(a => a.ResetPasswordToken == token).FirstOrDefaultAsync();
+
+			if (account == null)
+			{
+				throw new ErrorException(502, "bad_gateway", "Đường dẫn đổi mật khẩu đã hết hạn, vui lòng thử lại sau");
+			}
 		}
 
 		private ClaimsPrincipal DecodeJwtToken(string token)

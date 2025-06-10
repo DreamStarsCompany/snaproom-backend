@@ -1,4 +1,5 @@
 ﻿using SnapRoom.Common.Base;
+using SnapRoom.Common.Enum;
 using SnapRoom.Contract.Repositories.Dtos.AccountDtos;
 
 namespace SnapRoom.Contract.Services
@@ -11,7 +12,7 @@ namespace SnapRoom.Contract.Services
 		Task DesignerRegister(DesignerRegisterDto registerDto);
 		Task SendApplicationResultEmail(string email, bool isApproved);
 		Task VerifyAccount(string token);
-		Task ForgetPassword(string email);
+		Task ForgetPassword(RoleEnum role, string email);
 		Task VerifyResetPassowrd(string token);
 		Task ResetPassword(string token, string newPassword);
 		Task UpdatePassword(string password, string newPassword);

@@ -111,10 +111,17 @@ namespace SnapRoom.Services
 
 			var backendUrl = _confg["BACKEND_URL"];
 			string resetUrl = $"{backendUrl}/api/authentication/verify-reset-password?token={resetToken}";
+			string imageUrl = "https://dataimage.blob.core.windows.net/snaproom/app-banner.png";
+
 
 			var body = $@"
 				<div style='font-family: Arial, sans-serif; line-height: 1.5;'>
-					<p>Chúng tôi nhận được yêu cầu khôi phục mật khẩu cho tài khoản của bạn tại <strong>Kids Vaccine</strong>. Nếu bạn đã yêu cầu điều này, vui lòng nhấn vào nút bên dưới để đặt lại mật khẩu:</p>
+					<div style='text-align: center; margin-bottom: 20px;'>
+					<img src='{imageUrl}' alt='SnapRoom Banner' style='max-width: 100%; height: auto;' />
+				</div>				
+
+				<div style='font-family: Arial, sans-serif; line-height: 1.5;'>
+					<p>Chúng tôi nhận được yêu cầu khôi phục mật khẩu cho tài khoản của bạn tại <strong>SnapRoom</strong>. Nếu bạn đã gửi yêu cầu này, vui lòng nhấn vào nút bên dưới để đặt lại mật khẩu:</p>
 
 					<p style='text-align: center;'>
 						<a href='{resetUrl}' 
@@ -124,11 +131,11 @@ namespace SnapRoom.Services
 						</a>
 					</p>
 
-					<p>Liên kết này sẽ hết hạn sau <strong>15 phút</strong>, vui lòng đặt lại mật khẩu sớm nhất có thể.</p>
+					<p>Liên kết này sẽ hết hạn sau <strong>15 phút</strong>, vui lòng đặt lại mật khẩu trong thời gian sớm nhất có thể.</p>
 
 					<p>Nếu bạn không yêu cầu khôi phục mật khẩu, vui lòng bỏ qua email này.</p>
 
-					<p>Trân trọng,<br><strong>Bộ phận hỗ trợ KVC</strong></p>
+					<p>Trân trọng,<br><strong>Bộ phận hỗ trợ SnapRoom</strong></p>
 				</div>";
 
 			var mailMessage = new MailMessage

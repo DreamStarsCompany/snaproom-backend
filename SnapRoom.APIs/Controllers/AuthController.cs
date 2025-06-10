@@ -11,10 +11,12 @@ namespace SnapRoom.APIs.Controllers
 	public class AuthController : ControllerBase
 	{
 		private readonly IAuthService _authService;
+		private readonly IConfiguration _config;
 
-		public AuthController(IAuthService authService)
+		public AuthController(IAuthService authService, IConfiguration config)
 		{
 			_authService = authService;
+			_config = config;
 		}
 
 		[HttpPost("customer/login")]
@@ -97,6 +99,36 @@ namespace SnapRoom.APIs.Controllers
 			));
 		}
 
+		[HttpPost("reset-password")]
+		public async Task<IActionResult> ResetPassword(string token, string newPassword)
+		{
+			await _authService.ResetPassword(token, newPassword);
 
+			return Ok(new BaseResponse<object>(
+				statusCode: StatusCodeEnum.OK,
+				message: "Thay đổi mật khẩu thành công",
+				data: null
+			));
+		}
+
+
+		[HttpGet("verify-reset-password")]
+		public async Task<IActionResult> VerifyResetPassowrd(string token)
+		{
+			await _authService.VerifyResetPassowrd(token);
+			return Redirect("https://google.com");
+			//return Redirect(_config["FRONTEND_URL"]! + $"/forgot-password?token={token}");
+		}
+
+		[HttpPost("forget-password")]
+		public async Task<IActionResult> ForgetPassword(RoleEnum role, string email)
+		{
+			await _authService.ForgetPassword(role, email);
+			return Ok(new BaseResponse<object>(
+				statusCode: StatusCodeEnum.OK,
+				message: "Forget password",
+				data: null
+			));
+		}
 	}
 }

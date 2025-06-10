@@ -14,14 +14,14 @@ namespace SnapRoom.Services
 
 		private readonly IUnitOfWork _unitOfWork;
 		private readonly IMapper _mapper;
-		private readonly IAuthService _authenticationService;
+		private readonly IAuthService _authService;
 		private readonly IConfiguration _config;
 
 		public AccountService(IUnitOfWork unitOfWork, IMapper mapper, IAuthService authenticationService, IConfiguration config)
 		{
 			_unitOfWork = unitOfWork;
 			_mapper = mapper;
-			_authenticationService = authenticationService;
+			_authService = authenticationService;
 			_config = config;
 		}
 
