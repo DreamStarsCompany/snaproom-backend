@@ -66,7 +66,6 @@ namespace SnapRoom.APIs.Controllers
 			));
 		}
 
-
 		[HttpPost("designs")]
 		public async Task<IActionResult> CreateDesign(DesignCreateDto dto)
 		{
@@ -78,6 +77,19 @@ namespace SnapRoom.APIs.Controllers
 				data: null
 			));
 		}
+
+		[HttpPost("furnitures")]
+		public async Task<IActionResult> CreateFurniture(FurnitureCreateDto dto)
+		{
+			await _productService.CreateFurniture(dto);
+
+			return Ok(new BaseResponse<object>(
+				statusCode: StatusCodeEnum.OK,
+				message: "Tạo sản phẩm thành công",
+				data: null
+			));
+		}
+
 
 		[HttpGet("products/{id}")]
 		public async Task<IActionResult> GetProductById(string id)

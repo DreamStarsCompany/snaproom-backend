@@ -220,6 +220,64 @@ namespace SnapRoom.Services
 			await _unitOfWork.SaveAsync();
 		}
 
+		public async Task UpdateCart(List<CartItemDto> dtos)
+		{
+			string customerId = _authService.GetCurrentAccountId();
+
+			Account? customer = await _unitOfWork.GetRepository<Account>().Entities
+				.Where(a => a.Id == customerId && a.Role == RoleEnum.Customer).FirstOrDefaultAsync();
+			if (customer == null)
+			{
+				throw new ErrorException(404, "", "Tài khoản không hợp lệ");
+			}
+
+			Order? cart = await _unitOfWork.GetRepository<Order>().Entities
+				.Where(o => o.CustomerId == customerId && o.IsCart).FirstOrDefaultAsync();
+			if (cart == null) 
+			{
+				throw new ErrorException(404, "", "Giỏ hàng hiện tại không tồn tại");
+			}
+
+			foreach(var cartItem in dtos)
+			{
+				//Only furniture needs to be updated in the cart
+				Product? product = await _unitOfWork.GetRepository<Product>().Entities
+					.Where(p => p.Id == cartItem.ProductId && p.Furniture != null && p.DeletedBy == null).FirstOrDefaultAsync();
+
+				if (product == null)
+				{
+					throw new ErrorException(404, "", "Sản phẩm không tồn tại");
+				}
+
+				if (cartItem.Quantity <= 0)
+				{
+					cartItem.Quantity = 1;
+				}
+
+				OrderDetail? detail = cart.OrderDetails?.FirstOrDefault(od => od.ProductId == cartItem.ProductId);
+				if (detail == null)
+				{
+					throw new ErrorException(404, "", $"Sản phẩm không có trong giỏ hàng");
+				}
+				if (detail.Product.DesignerId != product.DesignerId)
+				{
+					throw new ErrorException(404, "", "Mỗi đơn hàng chỉ áp dụng cho sản phẩm của 1 nhà thiết kế");
+				}
+				if (detail.Quantity == cartItem.Quantity)
+				{
+					continue;
+				}
+				cart.OrderPrice -= detail.DetailPrice; // Remove old price
+				detail.Quantity = cartItem.Quantity;
+				detail.DetailPrice = detail.Quantity * detail.Product.Price; // Update price
+				cart.OrderPrice += detail.DetailPrice; // Add new price
+				_unitOfWork.GetRepository<OrderDetail>().Update(detail);
+			}
+
+			_unitOfWork.GetRepository<Order>().Update(cart);
+
+			await _unitOfWork.SaveAsync();
+		}
 
 		public async Task DeleteFromCart(string productId)
 		{

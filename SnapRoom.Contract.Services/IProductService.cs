@@ -1,6 +1,5 @@
 ﻿using SnapRoom.Common.Base;
 using SnapRoom.Contract.Repositories.Dtos.ProductDtos;
-using SnapRoom.Contract.Repositories.Entities;
 
 namespace SnapRoom.Contract.Services
 {
@@ -12,5 +11,6 @@ namespace SnapRoom.Contract.Services
 		Task<BasePaginatedList<object>> GetDesignsForDesigner(int pageNumber, int pageSize);
 		Task<object> GetProductById(string id);
 		Task CreateDesign(DesignCreateDto dto);
+		Task CreateFurniture(FurnitureCreateDto dto);
 	}
 }

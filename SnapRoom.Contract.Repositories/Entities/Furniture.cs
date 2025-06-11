@@ -9,6 +9,5 @@ namespace SnapRoom.Contract.Repositories.Entities
 		[Column(TypeName = "nvarchar(36)")]
 		public string Id { get; set; } = Guid.NewGuid().ToString().ToUpper();
 		public virtual Product? Product { get; set; }
-		public int Stock { get; set; }
 	}
 }

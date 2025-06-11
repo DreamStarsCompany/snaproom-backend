@@ -116,8 +116,8 @@ namespace SnapRoom.APIs.Controllers
 		public async Task<IActionResult> VerifyResetPassowrd(string token)
 		{
 			await _authService.VerifyResetPassowrd(token);
-			return Redirect("https://google.com");
-			//return Redirect(_config["FRONTEND_URL"]! + $"/forgot-password?token={token}");
+			//return Redirect("https://google.com");
+			return Redirect(_config["FRONTEND_URL"]! + $"reset-password?token={token}");
 		}
 
 		[HttpPost("forget-password")]

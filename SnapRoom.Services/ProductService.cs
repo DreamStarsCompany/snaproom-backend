@@ -167,10 +167,13 @@ namespace SnapRoom.Services
 				.Where(c => c.Id == dto.StyleId && c.Style && c.DeletedBy == null)
 				.FirstOrDefaultAsync();
 
-			// Initialize the design product
+			if (style == null)
+			{
+				throw new ErrorException(404, "", "Danh mục phong cách không hợp lệ");
+			}
+
 			Product design = new()
 			{
-				Id = Guid.NewGuid().ToString(), // Ensure a unique ID before using it in related entities
 				Name = dto.Name,
 				Description = dto.Description,
 				DesignerId = designerId,
@@ -213,6 +216,75 @@ namespace SnapRoom.Services
 			await _unitOfWork.GetRepository<Product>().InsertAsync(design);
 			await _unitOfWork.SaveAsync();
 		}
+
+		public async Task CreateFurniture(FurnitureCreateDto dto)
+		{
+			string designerId = _authService.GetCurrentAccountId();
+
+			Account? designer = await _unitOfWork.GetRepository<Account>().Entities
+				.Where(a => a.Id == designerId && a.Role == RoleEnum.Designer)
+				.FirstOrDefaultAsync();
+
+			if (designer == null)
+			{
+				throw new ErrorException(404, "", "Tài khoản không hợp lệ");
+			}
+
+			Category? style = await _unitOfWork.GetRepository<Category>().Entities
+				.Where(c => c.Id == dto.StyleId && c.Style && c.DeletedBy == null)
+				.FirstOrDefaultAsync();
+
+			if (style == null)
+			{
+				throw new ErrorException(404, "", "Danh mục phong cách không hợp lệ");
+			}
+
+			Product furniture = new()
+			{
+				Name = dto.Name,
+				Description = dto.Description,
+				ParentDesignId = dto.ParentDesignId,
+				DesignerId = designerId,
+				Price = dto.Price,
+				Active = dto.Active,
+				Rating = 0.0,
+				ProductCategories = new List<ProductCategory>()
+			};
+
+			// Attach the design entity
+			furniture.Furniture = new Furniture
+			{
+				Id = furniture.Id
+			};
+
+			furniture.ProductCategories.Add(new ProductCategory
+			{
+				ProductId = furniture.Id,
+				CategoryId = dto.StyleId
+			});
+
+			// Prepare categories
+			foreach (var categoryId in dto.CategoryIds.Distinct()) // prevent duplicates just in case
+			{
+				var categoryExists = await _unitOfWork.GetRepository<Category>().Entities
+					.AnyAsync(c => c.Id == categoryId && !c.Style && c.DeletedBy == null);
+
+				if (!categoryExists)
+				{
+					throw new ErrorException(404, "", "Danh mục không hợp lệ");
+				}
+
+				furniture.ProductCategories.Add(new ProductCategory
+				{
+					ProductId = furniture.Id,
+					CategoryId = categoryId
+				});
+			}
+
+			await _unitOfWork.GetRepository<Product>().InsertAsync(furniture);
+			await _unitOfWork.SaveAsync();
+		}
+
 
 		public async Task<object> GetProductById(string id)
 		{
