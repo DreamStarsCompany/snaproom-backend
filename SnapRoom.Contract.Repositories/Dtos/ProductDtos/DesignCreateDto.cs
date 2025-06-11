@@ -1,4 +1,6 @@
-﻿namespace SnapRoom.Contract.Repositories.Dtos.ProductDtos
+﻿using Microsoft.AspNetCore.Http;
+
+namespace SnapRoom.Contract.Repositories.Dtos.ProductDtos
 {
 	public class DesignCreateDto
 	{
@@ -9,5 +11,7 @@
 		public bool Active { get; set; } = true;
 		public string StyleId { get; set; } = default!;
 		public List<string> CategoryIds { get; set; } = new List<string>();
+		public IFormFile PrimaryImage { get; set; } = default!;
+		public List<IFormFile>? Images { get; set; } = new List<IFormFile>();
 	}
 }

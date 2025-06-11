@@ -213,6 +213,39 @@ namespace SnapRoom.Services
 				});
 			}
 
+			try
+			{
+				// Handle primary image
+				string primaryImageUrl = await CoreHelper.UploadImage(dto.PrimaryImage);
+				Image primaryImage = new Image
+				{
+					ProductId = design.Id,
+					ImageSource = primaryImageUrl,
+					IsPrimary = true
+				};
+				await _unitOfWork.GetRepository<Image>().InsertAsync(primaryImage);
+
+				if (dto.Images != null && dto.Images.Any())
+				{
+					foreach (var imageFile in dto.Images)
+					{
+						string imageUrl = await CoreHelper.UploadImage(imageFile);
+						Image image = new Image
+						{
+							ProductId = design.Id,
+							ImageSource = imageUrl,
+							IsPrimary = false
+						};
+						await _unitOfWork.GetRepository<Image>().InsertAsync(image);
+					}
+				}
+			}
+			catch (Exception ex)
+			{
+				throw new ErrorException(500, "", "Lỗi khi tạo thiết kế: " + ex.Message);
+			}
+
+
 			await _unitOfWork.GetRepository<Product>().InsertAsync(design);
 			await _unitOfWork.SaveAsync();
 		}
@@ -281,6 +314,39 @@ namespace SnapRoom.Services
 				});
 			}
 
+			try
+			{
+				// Handle primary image
+				string primaryImageUrl = await CoreHelper.UploadImage(dto.PrimaryImage);
+				Image primaryImage = new Image
+				{
+					ProductId = furniture.Id,
+					ImageSource = primaryImageUrl,
+					IsPrimary = true
+				};
+				await _unitOfWork.GetRepository<Image>().InsertAsync(primaryImage);
+
+				if (dto.Images != null && dto.Images.Any())
+				{
+					foreach (var imageFile in dto.Images)
+					{
+						string imageUrl = await CoreHelper.UploadImage(imageFile);
+						Image image = new Image
+						{
+							ProductId = furniture.Id,
+							ImageSource = imageUrl,
+							IsPrimary = false
+						};
+						await _unitOfWork.GetRepository<Image>().InsertAsync(image);
+					}
+				}
+			}
+			catch (Exception ex)
+			{
+				throw new ErrorException(500, "", "Lỗi khi tạo thiết kế: " + ex.Message);
+			}
+
+
 			await _unitOfWork.GetRepository<Product>().InsertAsync(furniture);
 			await _unitOfWork.SaveAsync();
 		}
@@ -321,6 +387,7 @@ namespace SnapRoom.Services
 				product.Rating,
 				product.Price,
 				product.Active,
+				product.Approved,
 				Designer = new { product.Designer?.Id, product.Designer?.Name },
 				ParentDesign = new { product.ParentDesign?.Id, product.ParentDesign?.Name },
 				PrimaryImage = new { product.Images?.FirstOrDefault(img => img.IsPrimary)?.ImageSource },
@@ -376,6 +443,7 @@ namespace SnapRoom.Services
 				product.Rating,
 				product.Price,
 				product.Active,
+				product.Approved,
 				Designer = new { product.Designer?.Id, product.Designer?.Name },
 				Furnitures = product.Furnitures?
 					.Select(f => new
