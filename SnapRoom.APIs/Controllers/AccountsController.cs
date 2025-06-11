@@ -30,5 +30,17 @@ namespace SnapRoom.APIs.Controllers
 			));
 		}
 
+		[HttpGet("awaiting-designers")]
+		public async Task<IActionResult> GetAwaitingDesigners(int pageNumber, int pageSize)
+		{
+			var accounts = await _accountService.GetAwaitingDesigners(pageNumber, pageSize);
+
+			return Ok(new BaseResponse<object>(
+				statusCode: StatusCodeEnum.OK,
+				message: "Lấy tài khoản thành công",
+				data: accounts
+			));
+		}
+
 	}
 }

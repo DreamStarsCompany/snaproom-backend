@@ -43,5 +43,25 @@ namespace SnapRoom.Services
 
 			return new BasePaginatedList<object>(responseItems, query.Count, pageNumber, pageSize);
 		}
+
+		public async Task<BasePaginatedList<object>> GetAwaitingDesigners(int pageNumber, int pageSize)
+		{
+			List<Account> query = await _unitOfWork.GetRepository<Account>().Entities
+				.Where(a => a.Role == RoleEnum.Designer && a.VerificationToken != null && a.DeletedBy == null).ToListAsync();
+
+			var responseItems = query.Select(x => new
+			{
+				x.Id,
+				x.Name,
+				x.Email,
+				x.Profession,
+				x.ContactNumber,
+				x.Role,
+				x.ApplicationUrl
+			}).ToList();
+
+			return new BasePaginatedList<object>(responseItems, query.Count, pageNumber, pageSize);
+		}
+
 	}
 }
