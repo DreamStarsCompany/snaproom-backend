@@ -117,7 +117,8 @@ namespace SnapRoom.APIs.Controllers
 		{
 			await _authService.VerifyResetPassowrd(token);
 			//return Redirect("https://google.com");
-			return Redirect(_config["FRONTEND_URL"]! + $"reset-password?token={token}");
+
+			return Redirect(_config["FRONTEND_URL"]! + $"/reset-password?token={token}");
 		}
 
 		[HttpPost("forget-password")]
