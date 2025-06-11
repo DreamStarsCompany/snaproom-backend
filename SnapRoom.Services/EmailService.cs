@@ -110,7 +110,7 @@ namespace SnapRoom.Services
 			};
 
 			var backendUrl = _confg["BACKEND_URL"];
-			string resetUrl = $"{backendUrl}/api/authentication/verify-reset-password?token={resetToken}";
+			string resetUrl = $"{backendUrl}/api/auth/verify-reset-password?token={resetToken}";
 			string imageUrl = "https://dataimage.blob.core.windows.net/snaproom/app-banner.png";
 
 
