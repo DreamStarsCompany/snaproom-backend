@@ -242,11 +242,15 @@ namespace SnapRoom.Services
 			{
 				//Only furniture needs to be updated in the cart
 				Product? product = await _unitOfWork.GetRepository<Product>().Entities
-					.Where(p => p.Id == cartItem.ProductId && p.Furniture != null && p.DeletedBy == null).FirstOrDefaultAsync();
+					.Where(p => p.Id == cartItem.ProductId && p.DeletedBy == null).FirstOrDefaultAsync();
 
 				if (product == null)
 				{
 					throw new ErrorException(404, "", "Sản phẩm không tồn tại");
+				}
+				if (product.Design != null) 
+				{
+					continue;
 				}
 
 				if (cartItem.Quantity <= 0)
