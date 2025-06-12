@@ -66,6 +66,31 @@ namespace SnapRoom.APIs.Controllers
 			));
 		}
 
+		[HttpGet("products/new")]
+		public async Task<IActionResult> GetNewProducts(int pageNumber = -1, int pageSize = -1)
+		{
+			var products = await _productService.GetNewProducts(pageNumber, pageSize);
+
+			return Ok(new BaseResponse<object>(
+				statusCode: StatusCodeEnum.OK,
+				message: "Lấy sản phẩm thành công",
+				data: products
+			));
+		}
+
+		[HttpPost("products/new")]
+		public async Task<IActionResult> ApproveNewProduct(string id)
+		{
+			await _productService.ApproveNewProduct(id);
+
+			return Ok(new BaseResponse<object>(
+				statusCode: StatusCodeEnum.OK,
+				message: "Duyệt sản phẩm thành công",
+				data: null
+			));
+		}
+
+
 		[HttpPost("designs")]
 		public async Task<IActionResult> CreateDesign(DesignCreateDto dto)
 		{

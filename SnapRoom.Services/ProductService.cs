@@ -149,6 +149,46 @@ namespace SnapRoom.Services
 			return new BasePaginatedList<object>(responseItems, query.Count, pageNumber, pageSize);
 		}
 
+		public async Task<BasePaginatedList<object>> GetNewProducts(int pageNumber, int pageSize)
+		{
+			List<Product> query = await _unitOfWork.GetRepository<Product>().Entities
+	.			Where(p => !p.Approved).ToListAsync();
+
+			var responseItems = query.Select(x => new
+			{
+				x.Id,
+				x.Name,
+				x.Description,
+				x.Rating,
+				x.Price,
+				PrimaryImage = new { x.Images?.FirstOrDefault(img => img.IsPrimary)?.ImageSource },
+				Categories = x.ProductCategories?.Select(pc => new
+				{
+					Id = pc.CategoryId,
+					Name = _unitOfWork.GetRepository<Category>().Entities
+						.Where(c => c.Id == pc.CategoryId)
+						.Select(c => c.Name).FirstOrDefault()
+				}).ToList(),
+
+			}).ToList();
+
+			return new BasePaginatedList<object>(responseItems, query.Count, pageNumber, pageSize);
+		}
+
+		public async Task ApproveNewProduct(string id)
+		{
+			Product? product = await _unitOfWork.GetRepository<Product>().Entities
+				.Where(p => p.Id == id && !p.Approved && p.DeletedBy == null).FirstOrDefaultAsync();
+
+			if (product == null)
+			{
+				throw new ErrorException(404, "", "Mã sản phẩm không hợp lệ");
+			}
+
+			product.Approved = true;
+			await _unitOfWork.SaveAsync();
+		}
+
 
 		public async Task CreateDesign(DesignCreateDto dto)
 		{
