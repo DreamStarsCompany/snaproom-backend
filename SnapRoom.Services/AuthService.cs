@@ -142,7 +142,7 @@ namespace SnapRoom.Services
 				.FirstOrDefaultAsync();
 			if (existingDesigner != null)
 			{
-				throw new BaseException.ErrorException(409, "conflict", "Email này đã được sử dụng, vui lòng thử lại");
+				throw new ErrorException(409, "conflict", "Email này đã được sử dụng, vui lòng thử lại");
 			}
 
 			// Hash the password
@@ -318,7 +318,7 @@ namespace SnapRoom.Services
 
 			if (accountIdClaim != null && Guid.TryParse(accountIdClaim.Value, out Guid parsedAccountId))
 			{
-				return parsedAccountId.ToString();
+				return parsedAccountId.ToString().ToUpper();
 			}
 
 			return string.Empty;
