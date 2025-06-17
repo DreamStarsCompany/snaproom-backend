@@ -127,5 +127,18 @@ namespace SnapRoom.APIs.Controllers
 				data: product
 			));
 		}
+
+		[HttpPost("products/review")]
+		public async Task<IActionResult> Review(string id, string comment, int star)
+		{
+			await _productService.Review(id, comment, star);
+
+			return Ok(new BaseResponse<object>(
+				statusCode: StatusCodeEnum.OK,
+				message: "Review sản phẩm",
+				data: null
+			));
+		}
+
 	}
 }

@@ -11,9 +11,12 @@ namespace SnapRoom.APIs.Controllers
 	public class OrdersController : ControllerBase
 	{
 		private readonly IOrderService _orderService;
-		public OrdersController(IOrderService orderService)
+		private readonly IConfiguration _config;
+
+		public OrdersController(IOrderService orderService, IConfiguration config)
 		{
 			_orderService = orderService;
+			_config = config;
 		}
 
 		[HttpGet("orders")]
@@ -113,6 +116,14 @@ namespace SnapRoom.APIs.Controllers
 				message: "Xóa sản phẩm thành công",
 				data: null
 			));
+		}
+
+		[HttpGet("orders/{id}/{status}")]
+		public async Task<IActionResult> ProcessOrder(string id, int status)
+		{
+			await _orderService.ProcessOrder(id, status);
+
+			return Redirect(_config["FRONTEND_URL"]! + "/success");
 		}
 
 	}

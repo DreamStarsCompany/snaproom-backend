@@ -320,5 +320,33 @@ namespace SnapRoom.Services
 			await _unitOfWork.SaveAsync();
 		}
 
+		public async Task ProcessOrder(string orderId, int status)
+		{
+			Order? cart = await _unitOfWork.GetRepository<Order>().Entities
+				.Where(o => o.Id == orderId).FirstOrDefaultAsync();
+
+			if (cart == null)
+			{
+				throw new ErrorException(404, "", "Giỏ hàng hiện tại không tồn tại");
+			}
+
+			cart.IsCart = false;
+
+			TrackingStatus trackingStatus = new()
+			{
+				OrderId = cart.Id,
+				StatusId = status.ToString(),
+				Time = CoreHelper.SystemTimeNow
+			};
+
+			await _unitOfWork.GetRepository<TrackingStatus>().InsertAsync(trackingStatus);
+			try
+			{
+				await _unitOfWork.SaveAsync();
+
+			}
+			catch (Exception ex) { }
+		}
+
 	}
 }

@@ -14,5 +14,6 @@ namespace SnapRoom.Contract.Services
 		Task CreateFurniture(FurnitureCreateDto dto);
 		Task<BasePaginatedList<object>> GetNewProducts(int pageNumber, int pageSize);
 		Task ApproveNewProduct(string id);
+		Task Review(string id, string comment, int star);
 	}
 }

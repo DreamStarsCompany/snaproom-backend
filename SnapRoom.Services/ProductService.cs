@@ -84,7 +84,6 @@ namespace SnapRoom.Services
 			return new BasePaginatedList<object>(responseItems, query.Count, pageNumber, pageSize);
 		}
 
-
 		public async Task<BasePaginatedList<object>> GetFurnitures(int pageNumber, int pageSize)
 		{
 
@@ -534,5 +533,55 @@ namespace SnapRoom.Services
 			return responseItem;
 		}
 
+
+
+		public async Task Review(string id, string comment, int star)
+		{
+			string customerId = _authService.GetCurrentAccountId();
+
+			Account? customer = await _unitOfWork.GetRepository<Account>().Entities
+				.Where(a => a.Id == customerId && a.Role == RoleEnum.Customer)
+				.FirstOrDefaultAsync();
+
+			if (customer == null)
+			{
+				throw new ErrorException(404, "", "Tài khoản không hợp lệ");
+			}
+
+			Product? product = await _unitOfWork.GetRepository<Product>().Entities
+				.Where(p => p.Id == id && p.DeletedBy == null).FirstOrDefaultAsync();
+
+			if (product == null)
+			{
+				throw new ErrorException(404, "", "Sản phẩm không hợp lệ");
+			}
+			
+			if (product.ProductReviews?.Any(pr => pr.CustomerId == customerId) == true)
+			{
+				throw new ErrorException(400, "", "Bạn đã đánh giá sản phẩm này rồi");
+			}
+
+			ProductReview review = new ProductReview
+			{
+				ProductId = product.Id,
+				CustomerId = customerId,
+				Comment = comment,
+				Star = star,
+				Time = CoreHelper.SystemTimeNow
+			};
+			await _unitOfWork.GetRepository<ProductReview>().InsertAsync(review);
+			await _unitOfWork.SaveAsync();
+
+			double rating = 0;
+
+			foreach(var productReviews in product.ProductReviews!)
+			{
+				rating+= productReviews.Star;
+			}
+			rating /= product.ProductReviews!.Count;
+			product.Rating = rating;
+
+			await _unitOfWork.SaveAsync();
+		}
 	}
 }
