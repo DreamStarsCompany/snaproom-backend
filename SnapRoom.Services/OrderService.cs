@@ -91,7 +91,14 @@ namespace SnapRoom.Services
 				Status = _unitOfWork.GetRepository<TrackingStatus>().Entities.Where(t => t.OrderId == order.Id).OrderByDescending(t => t.Time).FirstOrDefault()?.Status.Name,
 				OrderDetails = order.OrderDetails?.Select(od => new
 				{
-					Product = new { od.Product.Id, od.Product.Name, od.Product.Price },
+					Product = new
+					{
+						od.Product.Id,
+						od.Product.Name,
+						od.Product.Price,
+						IsDesign = (od.Product.Design != null) ? true : false,
+						PrimaryImage = new { od.Product.Images?.FirstOrDefault(img => img.IsPrimary)?.ImageSource },
+					},
 					od.Quantity,
 					od.DetailPrice
 				}).ToList(),
