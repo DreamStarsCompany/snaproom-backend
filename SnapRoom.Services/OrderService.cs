@@ -37,7 +37,7 @@ namespace SnapRoom.Services
 				Designer = new { x.Designer?.Name },
 				x.Address,
 				x.PhoneNumber,
-				x.Method
+				x.Method,
 				Date = _unitOfWork.GetRepository<TrackingStatus>().Entities.FirstOrDefault(t => t.OrderId == x.Id && t.Status.Name == "Processing")?.Time,
 				Status = _unitOfWork.GetRepository<TrackingStatus>().Entities.Where(t => t.OrderId == x.Id).OrderByDescending(t => t.Time).FirstOrDefault()?.Status.Name,
 			}).ToList();
