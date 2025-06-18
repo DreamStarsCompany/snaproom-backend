@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace SnapRoom.Repositories.Migrations
 {
     /// <inheritdoc />
-    public partial class NewStart : Migration
+    public partial class newStart : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -150,7 +150,8 @@ namespace SnapRoom.Repositories.Migrations
                     IsCart = table.Column<bool>(type: "bit", nullable: false),
                     Address = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     CustomerId = table.Column<string>(type: "nvarchar(36)", nullable: false),
-                    DesignerId = table.Column<string>(type: "nvarchar(36)", nullable: true)
+                    DesignerId = table.Column<string>(type: "nvarchar(36)", nullable: true),
+                    PhoneNumber = table.Column<string>(type: "nvarchar(max)", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -177,8 +178,10 @@ namespace SnapRoom.Repositories.Migrations
                     Rating = table.Column<double>(type: "float", nullable: false),
                     Description = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     Active = table.Column<bool>(type: "bit", nullable: false),
+                    Approved = table.Column<bool>(type: "bit", nullable: false),
                     DesignerId = table.Column<string>(type: "nvarchar(36)", nullable: true),
                     ParentDesignId = table.Column<string>(type: "nvarchar(36)", nullable: true),
+                    InDesignQuantity = table.Column<int>(type: "int", nullable: true),
                     CreatedBy = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     LastUpdatedBy = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     DeletedBy = table.Column<string>(type: "nvarchar(max)", nullable: true),
@@ -274,8 +277,7 @@ namespace SnapRoom.Repositories.Migrations
                 name: "Furnitures",
                 columns: table => new
                 {
-                    Id = table.Column<string>(type: "nvarchar(36)", nullable: false),
-                    Stock = table.Column<int>(type: "int", nullable: false)
+                    Id = table.Column<string>(type: "nvarchar(36)", nullable: false)
                 },
                 constraints: table =>
                 {

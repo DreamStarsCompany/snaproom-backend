@@ -289,6 +289,145 @@ namespace SnapRoom.Services
 			await _unitOfWork.SaveAsync();
 		}
 
+		public async Task UpdateDesign(string id, DesignUpdateDto dto)
+		{
+			string designerId = _authService.GetCurrentAccountId();
+
+			Account? designer = await _unitOfWork.GetRepository<Account>().Entities
+				.Where(a => a.Id == designerId && a.Role == RoleEnum.Designer)
+				.FirstOrDefaultAsync();
+
+			if (designer == null)
+			{
+				throw new ErrorException(404, "", "Tài khoản không hợp lệ");
+			}
+
+			Product? design = await _unitOfWork.GetRepository<Product>().Entities
+				.Where(p => p.Id == id && p.Design != null && p.DeletedBy == null && p.DesignerId == designerId).FirstOrDefaultAsync();
+
+			if (design == null)
+			{
+				throw new ErrorException(404, "", "Thiết kế không hợp lệ");
+			}
+
+			design.Name = dto.Name ?? design.Name;
+			design.Price = dto.Price ?? design.Price;
+			design.Description = dto.Description ?? design.Description;
+			design.Active = dto.Active ?? design.Active;
+
+			if (dto.StyleId != null)
+			{
+				Category? style = await _unitOfWork.GetRepository<Category>().Entities
+					.Where(c => c.Id == dto.StyleId && c.Style && c.DeletedBy == null)
+					.FirstOrDefaultAsync();
+
+				if (style == null)
+				{
+					throw new ErrorException(404, "", "Danh mục phong cách không hợp lệ");
+				}
+				bool check = true;
+				foreach(var productCategory in design.ProductCategories!)
+				{
+					if (productCategory.CategoryId == dto.StyleId)
+					{
+						check = false;
+						break;
+					}
+				}
+				if (check) 
+				{
+					ProductCategory? existingStyle = design.ProductCategories?.FirstOrDefault(pc => pc.ProductId == design.Id && pc.Category.Style);
+
+					if (existingStyle != null)
+						await _unitOfWork.GetRepository<ProductCategory>().DeleteAsync(existingStyle);
+
+					ProductCategory newStyle = new ProductCategory
+					{
+						ProductId = design.Id,
+						CategoryId = dto.StyleId
+					};
+					await _unitOfWork.GetRepository<ProductCategory>().InsertAsync(newStyle);
+				}
+			}
+
+			if (dto.CategoryIds != null && dto.CategoryIds.Any())
+			{
+				// Remove old categories that are not in the new list
+				var existingCategories = design.ProductCategories?.Where(pc => !pc.Category.Style).ToList() ?? new List<ProductCategory>();
+				foreach (var category in existingCategories)
+				{
+					if (!dto.CategoryIds.Contains(category.CategoryId))
+					{
+						await _unitOfWork.GetRepository<ProductCategory>().DeleteAsync(category);
+					}
+				}
+				// Add new categories
+				foreach (var categoryId in dto.CategoryIds.Distinct()) // prevent duplicates just in case
+				{
+					var categoryExists = await _unitOfWork.GetRepository<Category>().Entities
+						.AnyAsync(c => c.Id == categoryId && !c.Style && c.DeletedBy == null);
+					if (!categoryExists)
+					{
+						throw new ErrorException(404, "", "Danh mục không hợp lệ");
+					}
+					if (!existingCategories.Any(pc => pc.CategoryId == categoryId))
+					{
+						ProductCategory newCategory = new ProductCategory
+						{
+							ProductId = design.Id,
+							CategoryId = categoryId
+						};
+						await _unitOfWork.GetRepository<ProductCategory>().InsertAsync(newCategory);
+					}
+				}
+			}
+
+			try
+			{
+				// Handle primary image
+				if (dto.PrimaryImage != null)
+				{
+					string primaryImageUrl = await CoreHelper.UploadImage(dto.PrimaryImage);
+					Image? primaryImage = design.Images?.FirstOrDefault(img => img.IsPrimary);
+					if (primaryImage != null)
+					{
+						primaryImage.ImageSource = primaryImageUrl;
+						await _unitOfWork.GetRepository<Image>().UpdateAsync(primaryImage);
+					}
+					else
+					{
+						primaryImage = new Image
+						{
+							ProductId = design.Id,
+							ImageSource = primaryImageUrl,
+							IsPrimary = true
+						};
+						await _unitOfWork.GetRepository<Image>().InsertAsync(primaryImage);
+					}
+				}
+				if (dto.Images != null && dto.Images.Any())
+				{
+					foreach (var imageFile in dto.Images)
+					{
+						string imageUrl = await CoreHelper.UploadImage(imageFile);
+						Image image = new Image
+						{
+							ProductId = design.Id,
+							ImageSource = imageUrl,
+							IsPrimary = false
+						};
+						await _unitOfWork.GetRepository<Image>().InsertAsync(image);
+					}
+				}
+			}
+			catch (Exception ex)
+			{
+				throw new ErrorException(500, "", "Lỗi khi cập nhật thiết kế: " + ex.Message);
+			}
+			await _unitOfWork.SaveAsync();
+
+		}
+
 		public async Task CreateFurniture(FurnitureCreateDto dto)
 		{
 			string designerId = _authService.GetCurrentAccountId();

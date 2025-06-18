@@ -287,6 +287,9 @@ namespace SnapRoom.Repositories.Migrations
                     b.Property<decimal>("OrderPrice")
                         .HasColumnType("decimal(18,2)");
 
+                    b.Property<string>("PhoneNumber")
+                        .HasColumnType("nvarchar(max)");
+
                     b.HasKey("Id");
 
                     b.HasIndex("CustomerId");
@@ -382,6 +385,9 @@ namespace SnapRoom.Repositories.Migrations
 
                     b.Property<string>("DesignerId")
                         .HasColumnType("nvarchar(36)");
+
+                    b.Property<int?>("InDesignQuantity")
+                        .HasColumnType("int");
 
                     b.Property<string>("LastUpdatedBy")
                         .HasColumnType("nvarchar(max)");

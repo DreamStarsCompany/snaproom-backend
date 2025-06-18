@@ -103,6 +103,19 @@ namespace SnapRoom.APIs.Controllers
 			));
 		}
 
+		[HttpPut("designs/{id}")]
+		public async Task<IActionResult> UpdateDesign(string id, DesignUpdateDto dto)
+		{
+			await _productService.UpdateDesign(id, dto);
+
+			return Ok(new BaseResponse<object>(
+				statusCode: StatusCodeEnum.OK,
+				message: "Cập nhật bản thiết kế thành công",
+				data: null
+			));
+		}
+
+
 		[HttpPost("furnitures")]
 		public async Task<IActionResult> CreateFurniture(FurnitureCreateDto dto)
 		{

@@ -18,6 +18,7 @@ namespace SnapRoom.Contract.Repositories.Entities
 		public virtual Account Customer { get; set; } = default!;
 		public string? DesignerId { get; set; }
 		public virtual Account? Designer { get; set; }
+		public string? PhoneNumber { get; set; }
 		public virtual ICollection<TrackingStatus>? TrackingStatuses { get; set; }
 		public virtual ICollection<OrderDetail>? OrderDetails { get; set; }
 	}

@@ -14,6 +14,7 @@ namespace SnapRoom.Contract.Repositories.Entities
 		public virtual Account? Designer { get; set; }
 		public string? ParentDesignId { get; set; }
 		public virtual Product? ParentDesign { get; set; }
+		public int? InDesignQuantity { get; set; }
 		public virtual ICollection<Product>? Furnitures { get; set; }
 		public virtual ICollection<ProductCategory>? ProductCategories { get; set; }
 		public virtual ICollection<ProductReview>? ProductReviews { get; set; }
