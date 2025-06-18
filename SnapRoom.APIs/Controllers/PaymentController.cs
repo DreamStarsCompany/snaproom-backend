@@ -19,7 +19,12 @@ namespace SnapRoom.APIs.Controllers
 		public async Task<IActionResult> PayCart()
 		{
 			var result = await _paymentService.PayCart();
-			return Redirect(result);
+
+			return Ok(new BaseResponse<object>(
+				statusCode: StatusCodeEnum.OK,
+				message: "Chuyển hướng thanh toán",
+				data: result
+			));
 		}
 
 	}
