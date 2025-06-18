@@ -118,6 +118,19 @@ namespace SnapRoom.APIs.Controllers
 			));
 		}
 
+		[HttpPut("cart-info")]
+		public async Task<IActionResult> UpdateCartInfo(CartUpdateDto dto)
+		{
+			await _orderService.UpdateCartInfo(dto);
+
+			return Ok(new BaseResponse<object>(
+				statusCode: StatusCodeEnum.OK,
+				message: "Cập nhật thông tin giỏ hàng thành công",
+				data: null
+			));
+		}
+
+
 		[HttpGet("orders/{id}/{status}")]
 		public async Task<IActionResult> ProcessOrder(string id, int status)
 		{

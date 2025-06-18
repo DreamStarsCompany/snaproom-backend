@@ -13,6 +13,7 @@ namespace SnapRoom.Contract.Services
 		Task AddToCart(CartItemDto dto);
 		Task UpdateCart(List<CartItemDto> dtos);
 		Task DeleteFromCart(string productId);
+		Task UpdateCartInfo(CartUpdateDto dto);
 		Task ProcessOrder(string orderId, int status);
 	}
 }

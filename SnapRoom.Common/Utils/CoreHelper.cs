@@ -44,5 +44,27 @@ namespace SnapRoom.Common.Utils
 			return $"https://dataimage.blob.core.windows.net/snaproom/{blobName}";
 		}
 
+		public static async Task DeleteImage(string imageSource)
+		{
+			IConfiguration config = new ConfigurationBuilder()
+				.AddJsonFile("appsettings.json", optional: false, reloadOnChange: true)
+				.Build();
+
+			string connectionString = config.GetConnectionString("BlobContainer")!;
+			string containerName = "snaproom";
+			var blobServiceClient = new BlobServiceClient(connectionString);
+			var containerClient = blobServiceClient.GetBlobContainerClient(containerName);
+
+			string prefix = $"https://dataimage.blob.core.windows.net/{containerName}/";
+			if (!imageSource.StartsWith(prefix))
+				throw new ArgumentException("Invalid image source URL");
+
+			string blobName = imageSource.Substring(prefix.Length);
+
+			// Get the BlobClient and delete the blob
+			var blobClient = containerClient.GetBlobClient(blobName);
+			await blobClient.DeleteIfExistsAsync();
+		}
+
 	}
 }

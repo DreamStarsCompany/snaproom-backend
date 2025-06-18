@@ -8,5 +8,7 @@ namespace SnapRoom.Common.Enum
 {
 	public enum MethodEnum
 	{
+		COD = 1, // Cash on Delivery
+		Transfer = 2, // Bank Transfer
 	}
 }

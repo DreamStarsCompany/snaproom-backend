@@ -35,6 +35,9 @@ namespace SnapRoom.Services
 				x.OrderPrice,
 				Customer = new { x.Customer?.Name },
 				Designer = new { x.Designer?.Name },
+				x.Address,
+				x.PhoneNumber,
+				x.Method
 				Date = _unitOfWork.GetRepository<TrackingStatus>().Entities.FirstOrDefault(t => t.OrderId == x.Id && t.Status.Name == "Processing")?.Time,
 				Status = _unitOfWork.GetRepository<TrackingStatus>().Entities.Where(t => t.OrderId == x.Id).OrderByDescending(t => t.Time).FirstOrDefault()?.Status.Name,
 			}).ToList();
@@ -88,6 +91,9 @@ namespace SnapRoom.Services
 				order.OrderPrice,
 				Customer = new { order.Customer.Name },
 				Designer = new { order.Designer?.Name },
+				order.Address,
+				order.PhoneNumber,
+				order.Method,
 				Status = _unitOfWork.GetRepository<TrackingStatus>().Entities.Where(t => t.OrderId == order.Id).OrderByDescending(t => t.Time).FirstOrDefault()?.Status.Name,
 				OrderDetails = order.OrderDetails?.Select(od => new
 				{
@@ -136,6 +142,9 @@ namespace SnapRoom.Services
 			{
 				cart.Id,
 				cart.OrderPrice,
+				cart.Address,
+				cart.PhoneNumber,
+				cart.Method,
 				OrderDetails = cart.OrderDetails?.Select(od => new
 				{
 					Product = new
@@ -183,7 +192,8 @@ namespace SnapRoom.Services
 			Order cart = await _unitOfWork.GetRepository<Order>().Entities
 				.Where(o => o.CustomerId == customerId && o.IsCart).FirstOrDefaultAsync() ?? new() 
 				{
-					CustomerId = customerId
+					CustomerId = customerId,
+					DesignerId = product.DesignerId,
 				};
 
 
@@ -219,7 +229,7 @@ namespace SnapRoom.Services
 				ProductId = dto.ProductId,
 				Quantity = dto.Quantity,
 				DetailPrice = dto.Quantity * product.Price,
-				Product = product
+				Product = product,
 			};
 			cart.OrderPrice += orderDetail.DetailPrice;
 			await _unitOfWork.GetRepository<OrderDetail>().InsertAsync(orderDetail);
@@ -327,6 +337,25 @@ namespace SnapRoom.Services
 			await _unitOfWork.SaveAsync();
 		}
 
+		public async Task UpdateCartInfo(CartUpdateDto dto)
+		{
+			string customerId = _authService.GetCurrentAccountId();
+
+			// Fetch cart of the customer
+			Order? cart = await _unitOfWork.GetRepository<Order>().Entities
+				.Where(o => o.CustomerId == customerId && o.IsCart)
+				.FirstOrDefaultAsync();
+
+			if (cart == null || cart.OrderDetails == null || cart.OrderDetails.Count == 0)
+				throw new ErrorException(404, "", "Giỏ hàng hiện tại không tồn tại");
+
+			cart.Address = dto.Address;
+			cart.PhoneNumber = dto.PhoneNumber;
+			cart.Method = dto.Method;
+
+			await _unitOfWork.SaveAsync();
+		}
+
 		public async Task ProcessOrder(string orderId, int status)
 		{
 			Order? cart = await _unitOfWork.GetRepository<Order>().Entities
@@ -354,6 +383,5 @@ namespace SnapRoom.Services
 			}
 			catch (Exception ex) { }
 		}
-
 	}
 }

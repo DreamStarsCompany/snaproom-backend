@@ -388,41 +388,207 @@ namespace SnapRoom.Services
 				if (dto.PrimaryImage != null)
 				{
 					string primaryImageUrl = await CoreHelper.UploadImage(dto.PrimaryImage);
+
 					Image? primaryImage = design.Images?.FirstOrDefault(img => img.IsPrimary);
+
 					if (primaryImage != null)
 					{
-						primaryImage.ImageSource = primaryImageUrl;
-						await _unitOfWork.GetRepository<Image>().UpdateAsync(primaryImage);
+						// DELETE the old image
+						await CoreHelper.DeleteImage(primaryImage.ImageSource);
+						await _unitOfWork.GetRepository<Image>().DeleteAsync(primaryImage);
 					}
-					else
+
+					// ADD the new primary image
+					var newPrimaryImage = new Image
 					{
-						primaryImage = new Image
-						{
-							ProductId = design.Id,
-							ImageSource = primaryImageUrl,
-							IsPrimary = true
-						};
-						await _unitOfWork.GetRepository<Image>().InsertAsync(primaryImage);
-					}
+						ProductId = design.Id,
+						ImageSource = primaryImageUrl,
+						IsPrimary = true
+					};
+					await _unitOfWork.GetRepository<Image>().InsertAsync(newPrimaryImage);
 				}
 				if (dto.Images != null && dto.Images.Any())
 				{
+					// STEP 1: Delete existing non-primary images from DB and Blob
+					var existingImages = design.Images?.Where(img => !img.IsPrimary).ToList();
+					if (existingImages != null && existingImages.Any())
+					{
+						foreach (var oldImage in existingImages)
+						{
+							await CoreHelper.DeleteImage(oldImage.ImageSource); // Remove from Blob
+							await _unitOfWork.GetRepository<Image>().DeleteAsync(oldImage); // Remove from DB
+						}
+					}
+
+					// STEP 2: Upload and insert new images
 					foreach (var imageFile in dto.Images)
 					{
 						string imageUrl = await CoreHelper.UploadImage(imageFile);
-						Image image = new Image
+						var newImage = new Image
 						{
 							ProductId = design.Id,
 							ImageSource = imageUrl,
 							IsPrimary = false
 						};
-						await _unitOfWork.GetRepository<Image>().InsertAsync(image);
+						await _unitOfWork.GetRepository<Image>().InsertAsync(newImage);
 					}
 				}
 			}
 			catch (Exception ex)
 			{
 				throw new ErrorException(500, "", "Lỗi khi cập nhật thiết kế: " + ex.Message);
+			}
+			await _unitOfWork.SaveAsync();
+		}
+
+		public async Task UpdateFurniture(string id, FurnitureUpdateDto dto)
+		{
+			string designerId = _authService.GetCurrentAccountId();
+
+			Account? designer = await _unitOfWork.GetRepository<Account>().Entities
+				.Where(a => a.Id == designerId && a.Role == RoleEnum.Designer)
+				.FirstOrDefaultAsync();
+
+			if (designer == null)
+			{
+				throw new ErrorException(404, "", "Tài khoản không hợp lệ");
+			}
+
+			Product? furniture = await _unitOfWork.GetRepository<Product>().Entities
+				.Where(p => p.Id == id && p.Furniture != null && p.DeletedBy == null && p.DesignerId == designerId).FirstOrDefaultAsync();
+
+			if (furniture == null)
+			{
+				throw new ErrorException(404, "", "Sản phẩm nội thất không hợp lệ");
+			}
+
+			furniture.Name = dto.Name ?? furniture.Name;
+			furniture.Price = dto.Price ?? furniture.Price;
+			furniture.Description = dto.Description ?? furniture.Description;
+			furniture.Active = dto.Active ?? furniture.Active;
+
+			if (dto.StyleId != null)
+			{
+				Category? style = await _unitOfWork.GetRepository<Category>().Entities
+					.Where(c => c.Id == dto.StyleId && c.Style && c.DeletedBy == null)
+					.FirstOrDefaultAsync();
+
+				if (style == null)
+				{
+					throw new ErrorException(404, "", "Danh mục phong cách không hợp lệ");
+				}
+				bool check = true;
+				foreach (var productCategory in furniture.ProductCategories!)
+				{
+					if (productCategory.CategoryId == dto.StyleId)
+					{
+						check = false;
+						break;
+					}
+				}
+				if (check)
+				{
+					ProductCategory? existingStyle = furniture.ProductCategories?.FirstOrDefault(pc => pc.ProductId == furniture.Id && pc.Category.Style);
+
+					if (existingStyle != null)
+						await _unitOfWork.GetRepository<ProductCategory>().DeleteAsync(existingStyle);
+
+					ProductCategory newStyle = new ProductCategory
+					{
+						ProductId = furniture.Id,
+						CategoryId = dto.StyleId
+					};
+					await _unitOfWork.GetRepository<ProductCategory>().InsertAsync(newStyle);
+				}
+			}
+
+			if (dto.CategoryIds != null && dto.CategoryIds.Any())
+			{
+				// Remove old categories that are not in the new list
+				var existingCategories = furniture.ProductCategories?.Where(pc => !pc.Category.Style).ToList() ?? new List<ProductCategory>();
+				foreach (var category in existingCategories)
+				{
+					if (!dto.CategoryIds.Contains(category.CategoryId))
+					{
+						await _unitOfWork.GetRepository<ProductCategory>().DeleteAsync(category);
+					}
+				}
+				// Add new categories
+				foreach (var categoryId in dto.CategoryIds.Distinct()) // prevent duplicates just in case
+				{
+					var categoryExists = await _unitOfWork.GetRepository<Category>().Entities
+						.AnyAsync(c => c.Id == categoryId && !c.Style && c.DeletedBy == null);
+					if (!categoryExists)
+					{
+						throw new ErrorException(404, "", "Danh mục không hợp lệ");
+					}
+					if (!existingCategories.Any(pc => pc.CategoryId == categoryId))
+					{
+						ProductCategory newCategory = new ProductCategory
+						{
+							ProductId = furniture.Id,
+							CategoryId = categoryId
+						};
+						await _unitOfWork.GetRepository<ProductCategory>().InsertAsync(newCategory);
+					}
+				}
+			}
+
+			try
+			{
+				// Handle primary image
+				if (dto.PrimaryImage != null)
+				{
+					string primaryImageUrl = await CoreHelper.UploadImage(dto.PrimaryImage);
+
+					Image? primaryImage = furniture.Images?.FirstOrDefault(img => img.IsPrimary);
+
+					if (primaryImage != null)
+					{
+						// DELETE the old image
+						await CoreHelper.DeleteImage(primaryImage.ImageSource);
+						await _unitOfWork.GetRepository<Image>().DeleteAsync(primaryImage);
+					}
+
+					// ADD the new primary image
+					var newPrimaryImage = new Image
+					{
+						ProductId = furniture.Id,
+						ImageSource = primaryImageUrl,
+						IsPrimary = true
+					};
+					await _unitOfWork.GetRepository<Image>().InsertAsync(newPrimaryImage);
+				}
+				if (dto.Images != null && dto.Images.Any())
+				{
+					// STEP 1: Delete existing non-primary images from DB and Blob
+					var existingImages = furniture.Images?.Where(img => !img.IsPrimary).ToList();
+					if (existingImages != null && existingImages.Any())
+					{
+						foreach (var oldImage in existingImages)
+						{
+							await CoreHelper.DeleteImage(oldImage.ImageSource); // Remove from Blob
+							await _unitOfWork.GetRepository<Image>().DeleteAsync(oldImage); // Remove from DB
+						}
+					}
+
+					// STEP 2: Upload and insert new images
+					foreach (var imageFile in dto.Images)
+					{
+						string imageUrl = await CoreHelper.UploadImage(imageFile);
+						var newImage = new Image
+						{
+							ProductId = furniture.Id,
+							ImageSource = imageUrl,
+							IsPrimary = false
+						};
+						await _unitOfWork.GetRepository<Image>().InsertAsync(newImage);
+					}
+				}
+			}
+			catch (Exception ex)
+			{
+				throw new ErrorException(500, "", "Lỗi khi cập nhật nội thất: " + ex.Message);
 			}
 			await _unitOfWork.SaveAsync();
 
@@ -560,6 +726,7 @@ namespace SnapRoom.Services
 			var responseItem = new
 			{
 				product.Id,
+				Type = "Furniture",
 				product.Name,
 				product.Description,
 				product.Rating,
@@ -616,6 +783,7 @@ namespace SnapRoom.Services
 			var responseItem = new
 			{
 				product.Id,
+				Type = "Design",
 				product.Name,
 				product.Description,
 				product.Rating,
@@ -628,7 +796,8 @@ namespace SnapRoom.Services
 					{
 						f.Id,
 						f.Name,
-						PrimaryImage = new { f.Images?.FirstOrDefault(img => img.IsPrimary)?.ImageSource }
+						PrimaryImage = new { f.Images?.FirstOrDefault(img => img.IsPrimary)?.ImageSource },
+						f.InDesignQuantity
 					})
 					.ToList(),
 				PrimaryImage = new { product.Images?.FirstOrDefault(img => img.IsPrimary)?.ImageSource },
@@ -671,8 +840,6 @@ namespace SnapRoom.Services
 
 			return responseItem;
 		}
-
-
 
 		public async Task Review(string id, string comment, int star)
 		{
