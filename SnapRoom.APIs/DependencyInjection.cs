@@ -115,6 +115,7 @@ namespace SnapRoom.APIs
 			services.AddScoped<IAuthService, AuthService>();
 			services.AddScoped<ICategoryService, CategoryService>();
 			services.AddScoped<IConversationService, ConversationService>();
+			services.AddScoped<IDashboardService, DashboardService>();
 			services.AddScoped<IOrderService, OrderService>();
 			services.AddScoped<IPlanService, PlanService>();
 			services.AddScoped<IPaymentService, PaymentService>();
