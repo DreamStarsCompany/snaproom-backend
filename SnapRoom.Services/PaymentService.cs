@@ -61,7 +61,7 @@ namespace SnapRoom.Services
 
 			var paymentLinkRequest = new PaymentData(
 				orderCode: int.Parse(DateTimeOffset.Now.ToString("ffffff")),
-				amount: 1000,
+				amount: (int)cart.OrderPrice,
 				description: "Thanh toan don hang",
 				items: items,
 				returnUrl: backendUrl + $"/api/orders/{cart.Id}/1",
