@@ -120,18 +120,18 @@ namespace SnapRoom.Services
 			return monthlyStatusCounts;
 		}
 
-		public async Task<object> GetMonthlyCustomerGrowth()
+		public async Task<object> GetMonthlyUserGrowth()
 		{
 			var currentYear = DateTime.Now.Year;
 
-			var customers = await _unitOfWork.GetRepository<Account>().Entities
-				.Where(c => c.Role == RoleEnum.Customer && c.VerificationToken == null && c.CreatedTime.Year == currentYear)
+			var users = await _unitOfWork.GetRepository<Account>().Entities
+				.Where(c => (c.Role == RoleEnum.Customer || c.Role == RoleEnum.Designer) && c.VerificationToken == null && c.CreatedTime.Year == currentYear)
 				.ToListAsync();
 
 			var result = Enumerable.Range(1, 12).Select(i =>
 			{
 				var month = i;
-				var count = customers.Count(c => c.CreatedTime.Month == month);
+				var count = users.Count(c => c.CreatedTime.Month == month);
 				return new
 				{
 					month = month,

@@ -49,10 +49,10 @@ namespace SnapRoom.APIs.Controllers
 			));
 		}
 
-		[HttpGet("customer-growth")]
-		public async Task<IActionResult> GetMonthlyCustomerGrowth()
+		[HttpGet("user-growth")]
+		public async Task<IActionResult> GetMonthlyUserGrowth()
 		{
-			var result = await _dashboardService.GetMonthlyCustomerGrowth();
+			var result = await _dashboardService.GetMonthlyUserGrowth();
 			return Ok(new BaseResponse<object>(
 				statusCode: StatusCodeEnum.OK,
 				message: "Lấy dữ liệu thành công",
