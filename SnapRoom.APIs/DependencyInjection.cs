@@ -1,13 +1,14 @@
-﻿using Microsoft.OpenApi.Models;
-using SnapRoom.APIs.Middleware;
-using SnapRoom.Repositories.DatabaseContext;
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Diagnostics;
-using SnapRoom.Contract.Repositories.Mapper;
+using Microsoft.OpenApi.Models;
+using SnapRoom.APIs.Hubs;
+using SnapRoom.APIs.Middleware;
 using SnapRoom.Contract.Repositories.IUOW;
+using SnapRoom.Contract.Repositories.Mapper;
+using SnapRoom.Contract.Services;
+using SnapRoom.Repositories.DatabaseContext;
 using SnapRoom.Repositories.UOW;
 using SnapRoom.Services;
-using SnapRoom.Contract.Services;
 
 namespace SnapRoom.APIs
 {
@@ -30,6 +31,7 @@ namespace SnapRoom.APIs
 		{
 			//app.UseMiddleware<AuthMiddleware>();
 			app.UseMiddleware<ExceptionMiddleware>();
+			app.MapHub<ChatHub>("/chathub");
 		}
 
 		public static void ConfigRoute(this IServiceCollection services)
@@ -121,7 +123,7 @@ namespace SnapRoom.APIs
 			services.AddScoped<IPaymentService, PaymentService>();
 			services.AddScoped<IProductService, ProductService>();
 			services.AddScoped<EmailService>();
-
+			services.AddSignalR();
 			services.AddMemoryCache();
 		}
 
