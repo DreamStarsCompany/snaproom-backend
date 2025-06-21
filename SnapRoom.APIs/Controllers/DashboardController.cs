@@ -27,5 +27,72 @@ namespace SnapRoom.APIs.Controllers
 			));
 		}
 
+		[HttpGet("top-designers-by-revenue")]
+		public async Task<IActionResult> GetTopDesignersByRevenue(int topN)
+		{
+			var result = await _dashboardService.GetTopDesignersByRevenue(topN);
+			return Ok(new BaseResponse<object>(
+				statusCode: StatusCodeEnum.OK,
+				message: "Lấy dữ liệu thành công",
+				data: result
+			));
+		}
+
+		[HttpGet("orders")]
+		public async Task<IActionResult> GetOrders()
+		{
+			var result = await _dashboardService.GetOrders();
+			return Ok(new BaseResponse<object>(
+				statusCode: StatusCodeEnum.OK,
+				message: "Lấy dữ liệu thành công",
+				data: result
+			));
+		}
+
+		[HttpGet("customer-growth")]
+		public async Task<IActionResult> GetMonthlyCustomerGrowth()
+		{
+			var result = await _dashboardService.GetMonthlyCustomerGrowth();
+			return Ok(new BaseResponse<object>(
+				statusCode: StatusCodeEnum.OK,
+				message: "Lấy dữ liệu thành công",
+				data: result
+			));
+		}
+
+		[HttpGet("designer/revenue-by-day")]
+		public async Task<IActionResult> GetRevenueByDayForDesigner(int month, int year)
+		{
+			var result = await _dashboardService.GetRevenueByDayForDesigner(month, year);
+			return Ok(new BaseResponse<object>(
+				statusCode: StatusCodeEnum.OK,
+				message: "Lấy dữ liệu thành công",
+				data: result
+			));
+		}
+
+		[HttpGet("top-products")]
+		public async Task<IActionResult> GetTopSellingProducts()
+		{
+			var result = await _dashboardService.GetTopSellingProducts(5);
+			return Ok(new BaseResponse<object>(
+				statusCode: StatusCodeEnum.OK,
+				message: "Lấy dữ liệu thành công",
+				data: result
+			));
+		}
+
+		[HttpGet("top-products-reviews")]
+		public async Task<IActionResult> GetTopSellingProductsWithComments()
+		{
+			var result = await _dashboardService.GetTopSellingProductsWithComments(3);
+			return Ok(new BaseResponse<object>(
+				statusCode: StatusCodeEnum.OK,
+				message: "Lấy dữ liệu thành công",
+				data: result
+			));
+		}
+
+
 	}
 }
