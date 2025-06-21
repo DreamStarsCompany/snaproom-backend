@@ -28,5 +28,16 @@ namespace SnapRoom.APIs.Controllers
 			));
 		}
 
+		[HttpGet]
+		public async Task<IActionResult> GetConversations()
+		{
+			var result = await _conversationService.GetConversations();
+			return Ok(new BaseResponse<object>(
+				statusCode: StatusCodeEnum.OK,
+				message: "Lấy các đoạn hội thoại thành công",
+				data: result
+			));
+		}
+
 	}
 }
