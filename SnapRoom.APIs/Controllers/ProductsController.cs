@@ -153,6 +153,19 @@ namespace SnapRoom.APIs.Controllers
 			));
 		}
 
+		[HttpPut("design-furnitures/{id}")]
+		public async Task<IActionResult> UpdateFurnituresInDesign(string id, List<InDesignFurnitureDto> dtos)
+		{
+			await _productService.UpdateFurnituresInDesign(id, dtos);
+
+			return Ok(new BaseResponse<object>(
+				statusCode: StatusCodeEnum.OK,
+				message: "Cập nhật thành công",
+				data: null
+			));
+		}
+
+
 		[HttpPost("products/review")]
 		public async Task<IActionResult> Review(string id, string comment, int star)
 		{

@@ -14,6 +14,7 @@ namespace SnapRoom.Contract.Services
 		Task UpdateDesign(string id, DesignUpdateDto dto);
 		Task CreateFurniture(FurnitureCreateDto dto);
 		Task UpdateFurniture(string id, FurnitureUpdateDto dto);
+		Task UpdateFurnituresInDesign(string id, List<InDesignFurnitureDto> dtos);
 		Task<BasePaginatedList<object>> GetNewProducts(int pageNumber, int pageSize);
 		Task ApproveNewProduct(string id);
 		Task Review(string id, string comment, int star);

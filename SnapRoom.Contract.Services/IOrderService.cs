@@ -1,4 +1,5 @@
 ﻿using SnapRoom.Common.Base;
+using SnapRoom.Common.Enum;
 using SnapRoom.Contract.Repositories.Dtos.OrderDtos;
 
 namespace SnapRoom.Contract.Services
@@ -14,6 +15,6 @@ namespace SnapRoom.Contract.Services
 		Task UpdateCart(List<CartItemDto> dtos);
 		Task DeleteFromCart(string productId);
 		Task UpdateCartInfo(CartUpdateDto dto);
-		Task ProcessOrder(string orderId, int status);
+		Task ProcessOrder(string orderId, StatusEnum status);
 	}
 }

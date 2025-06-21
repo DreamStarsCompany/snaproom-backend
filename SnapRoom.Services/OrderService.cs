@@ -38,7 +38,7 @@ namespace SnapRoom.Services
 				x.Address,
 				x.PhoneNumber,
 				x.Method,
-				Date = _unitOfWork.GetRepository<TrackingStatus>().Entities.FirstOrDefault(t => t.OrderId == x.Id && t.Status.Name == "Processing")?.Time,
+				Date = _unitOfWork.GetRepository<TrackingStatus>().Entities.FirstOrDefault(t => t.OrderId == x.Id && t.StatusId == StatusEnum.Pending)?.Time,
 				Status = _unitOfWork.GetRepository<TrackingStatus>().Entities.Where(t => t.OrderId == x.Id).OrderByDescending(t => t.Time).FirstOrDefault()?.Status.Name,
 			}).ToList();
 
@@ -194,6 +194,7 @@ namespace SnapRoom.Services
 				{
 					CustomerId = customerId,
 					DesignerId = product.DesignerId,
+					Method = MethodEnum.COD,
 				};
 
 
@@ -356,7 +357,7 @@ namespace SnapRoom.Services
 			await _unitOfWork.SaveAsync();
 		}
 
-		public async Task ProcessOrder(string orderId, int status)
+		public async Task ProcessOrder(string orderId, StatusEnum status)
 		{
 			Order? cart = await _unitOfWork.GetRepository<Order>().Entities
 				.Where(o => o.Id == orderId).FirstOrDefaultAsync();
@@ -371,7 +372,7 @@ namespace SnapRoom.Services
 			TrackingStatus trackingStatus = new()
 			{
 				OrderId = cart.Id,
-				StatusId = status.ToString(),
+				StatusId = status,
 				Time = CoreHelper.SystemTimeNow
 			};
 

@@ -1,4 +1,5 @@
-﻿using SnapRoom.Common.Utils;
+﻿using SnapRoom.Common.Enum;
+using SnapRoom.Common.Utils;
 
 namespace SnapRoom.Contract.Repositories.Entities
 {
@@ -6,7 +7,7 @@ namespace SnapRoom.Contract.Repositories.Entities
 	{
 		public DateTimeOffset Time { get; set; } = CoreHelper.SystemTimeNow;
 
-		public string StatusId { get; set; } = default!;
+		public StatusEnum StatusId { get; set; } = default!;
 		public virtual Status Status { get; set; } = default!;
 		public string OrderId { get; set; } = default!;
 		public virtual Order Order { get; set; } = default!;

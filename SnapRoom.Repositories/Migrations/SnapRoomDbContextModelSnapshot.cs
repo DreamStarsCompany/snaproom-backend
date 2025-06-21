@@ -459,8 +459,8 @@ namespace SnapRoom.Repositories.Migrations
 
             modelBuilder.Entity("SnapRoom.Contract.Repositories.Entities.Status", b =>
                 {
-                    b.Property<string>("Id")
-                        .HasColumnType("nvarchar(36)");
+                    b.Property<int>("Id")
+                        .HasColumnType("int");
 
                     b.Property<string>("Name")
                         .IsRequired()
@@ -473,8 +473,8 @@ namespace SnapRoom.Repositories.Migrations
 
             modelBuilder.Entity("SnapRoom.Contract.Repositories.Entities.TrackingStatus", b =>
                 {
-                    b.Property<string>("StatusId")
-                        .HasColumnType("nvarchar(36)");
+                    b.Property<int>("StatusId")
+                        .HasColumnType("int");
 
                     b.Property<string>("OrderId")
                         .HasColumnType("nvarchar(36)");

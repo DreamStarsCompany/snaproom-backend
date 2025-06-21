@@ -733,7 +733,7 @@ namespace SnapRoom.Services
 				product.Price,
 				product.Active,
 				product.Approved,
-				Designer = new { product.Designer?.Id, product.Designer?.Name },
+				Designer = new { product.Designer?.Id, product.Designer?.Name, product.Designer?.AvatarSource },
 				ParentDesign = new { product.ParentDesign?.Id, product.ParentDesign?.Name },
 				PrimaryImage = new { product.Images?.FirstOrDefault(img => img.IsPrimary)?.ImageSource },
 				Images = product.Images?
@@ -790,7 +790,7 @@ namespace SnapRoom.Services
 				product.Price,
 				product.Active,
 				product.Approved,
-				Designer = new { product.Designer?.Id, product.Designer?.Name },
+				Designer = new { product.Designer?.Id, product.Designer?.Name, product.Designer?.AvatarSource },
 				Furnitures = product.Furnitures?
 					.Select(f => new
 					{
@@ -839,6 +839,35 @@ namespace SnapRoom.Services
 
 
 			return responseItem;
+		}
+
+
+		public async Task UpdateFurnituresInDesign(string id, List<InDesignFurnitureDto> dtos)
+		{
+			Product? design = await _unitOfWork.GetRepository<Product>().Entities
+				.Where(p => p.Id == id && p.Design != null && p.DeletedBy == null).FirstOrDefaultAsync();
+
+			if (design == null)
+			{
+				throw new ErrorException(404, "", "Thiết kế không hợp lệ");
+			}
+
+			foreach (var dto in dtos)
+			{
+				Product? furniture = await _unitOfWork.GetRepository<Product>().Entities
+					.Where(p => p.Id == dto.Id && p.Furniture != null && p.ParentDesignId == id && p.DeletedBy == null).FirstOrDefaultAsync();
+				if (furniture == null)
+				{
+					throw new ErrorException(404, "", "Nội thất không hợp lệ");
+				}
+				if (dto.Quantity < 0)
+				{
+					throw new ErrorException(400, "", "Số lượng trong thiết kế không thể âm");
+				}
+				furniture.InDesignQuantity = dto.Quantity;
+			}
+
+			await _unitOfWork.SaveAsync();
 		}
 
 		public async Task Review(string id, string comment, int star)

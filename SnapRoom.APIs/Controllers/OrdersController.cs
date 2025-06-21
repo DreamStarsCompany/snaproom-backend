@@ -132,7 +132,7 @@ namespace SnapRoom.APIs.Controllers
 
 
 		[HttpGet("orders/{id}/{status}")]
-		public async Task<IActionResult> ProcessOrder(string id, int status)
+		public async Task<IActionResult> ProcessOrder(string id, StatusEnum status)
 		{
 			await _orderService.ProcessOrder(id, status);
 
