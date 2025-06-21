@@ -56,14 +56,22 @@ namespace SnapRoom.Services
 				.Select(c => new
 				{
 					c.Id,
-					LastMessage = c.Messages!.OrderByDescending(m => m.CreatedTime).FirstOrDefault()!.Content,
-					LastMessageTime = c.Messages!.OrderByDescending(m => m.CreatedTime).FirstOrDefault()!.CreatedTime.ToString("o"),
+					LastMessageEntity = c.Messages!
+						.OrderByDescending(m => m.CreatedTime)
+						.FirstOrDefault(),
 					Sender = new
 					{
 						Name = c.DesignerId == userId ? c.Customer!.Name : c.Designer!.Name,
 						Avatar = c.DesignerId == userId ? c.Customer!.AvatarSource : c.Designer!.AvatarSource
 					}
-
+				})
+				.OrderByDescending(c => c.LastMessageEntity!.CreatedTime)
+				.Select(c => new
+				{
+					c.Id,
+					LastMessage = c.LastMessageEntity!.Content,
+					LastMessageTime = c.LastMessageEntity!.CreatedTime.ToString("o"),
+					c.Sender
 				})
 				.ToListAsync();
 			return conversations;
