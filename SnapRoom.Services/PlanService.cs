@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using SnapRoom.Contract.Repositories.Entities;
 using SnapRoom.Contract.Repositories.IUOW;
 using SnapRoom.Contract.Services;
 
@@ -17,5 +18,16 @@ namespace SnapRoom.Services
 			_authenticationService = authenticationService;
 		}
 
+		public async Task CreatePlan()
+		{
+			Plan plan = new Plan
+			{
+				Name = "Free Plan",
+				Description = "This is a free plan with limited features."
+			};
+
+			await _unitOfWork.GetRepository<Plan>().InsertAsync(plan);
+			await _unitOfWork.SaveAsync();
+		}
 	}
 }

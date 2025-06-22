@@ -89,13 +89,13 @@ namespace SnapRoom.APIs
 		{
 			services.AddCors(options =>
 			{
-				options.AddPolicy("AllowSpecificOrigins",
-					policy =>
-					{
-						policy.AllowAnyOrigin()
-							  .AllowAnyMethod()
-							  .AllowAnyHeader();
-					});
+				options.AddPolicy("AllowSpecificOrigins", policy =>
+				{
+					policy.WithOrigins("https://snaproom-frontend.vercel.app") // ✅ Your frontend URL
+						  .AllowAnyMethod()
+						  .AllowAnyHeader()
+						  .AllowCredentials(); // ✅ Only allowed with specific origin
+				});
 			});
 		}
 
