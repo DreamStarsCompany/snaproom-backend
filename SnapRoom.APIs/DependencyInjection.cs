@@ -91,7 +91,7 @@ namespace SnapRoom.APIs
 			{
 				options.AddPolicy("AllowSpecificOrigins", policy =>
 				{
-					policy.WithOrigins("https://snaproom-frontend.vercel.app") // ✅ Your frontend URL
+					policy.WithOrigins("https://snaproom-frontend.vercel.app", "http://localhost:3000") // ✅ Your frontend URL
 						  .AllowAnyMethod()
 						  .AllowAnyHeader()
 						  .AllowCredentials(); // ✅ Only allowed with specific origin
