@@ -91,10 +91,14 @@ namespace SnapRoom.APIs
 			{
 				options.AddPolicy("AllowSpecificOrigins", policy =>
 				{
-					policy.WithOrigins("https://snaproom-frontend.vercel.app", "http://localhost:3000", "http://10.0.2.2:3000", "http://10.0.2.2:8080") // ✅ Your frontend URL
-						  .AllowAnyMethod()
-						  .AllowAnyHeader()
-						  .AllowCredentials(); // ✅ Only allowed with specific origin
+					policy
+						.SetIsOriginAllowed(origin =>
+							origin == "https://snaproom-frontend.vercel.app" ||
+							origin == "http://localhost:3000" ||
+							origin.StartsWith("http://10.0.2.2")) // ✅ Allow all ports from mobile emulator
+						.AllowAnyMethod()
+						.AllowAnyHeader()
+						.AllowCredentials(); // ✅ Required if you use cookies or auth headers
 				});
 			});
 		}
