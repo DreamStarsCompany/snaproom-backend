@@ -30,6 +30,7 @@ namespace SnapRoom.Services
 				.Select(m => new
 				{
 					m.SenderId,
+					SenderAvatar = m.Sender.AvatarSource,
 					m.Content,
 					m.ConversationId,
 					CreatedTime = m.CreatedTime.ToString("o") // Send as string for JSON compatibility
@@ -37,6 +38,29 @@ namespace SnapRoom.Services
 				.ToListAsync();
 
 			return messages;
+		}
+
+		public async Task<object?> GetConversation(string otherUserId)
+		{
+			string userId = _authService.GetCurrentAccountId();
+
+			Account? user = await _unitOfWork.GetRepository<Account>().Entities
+				.Where(a => a.Id == userId).FirstOrDefaultAsync();
+
+			if (user == null)
+			{
+				throw new ErrorException(404, "", "Tài khoản không tồn tại");
+			}
+
+			Conversation? conversation = await _unitOfWork.GetRepository<Conversation>().Entities
+				.Where(c => (c.DesignerId == userId && c.CustomerId == otherUserId) || (c.DesignerId == otherUserId && c.CustomerId == userId))
+				.FirstOrDefaultAsync();
+
+
+			if (conversation == null)
+				return null; // No conversation yet
+
+			return conversation.Id;
 		}
 
 		public async Task<object> GetConversations()
