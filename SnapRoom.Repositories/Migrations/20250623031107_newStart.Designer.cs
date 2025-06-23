@@ -12,7 +12,7 @@ using SnapRoom.Repositories.DatabaseContext;
 namespace SnapRoom.Repositories.Migrations
 {
     [DbContext(typeof(SnapRoomDbContext))]
-    [Migration("20250619171556_newStart")]
+    [Migration("20250623031107_newStart")]
     partial class newStart
     {
         /// <inheritdoc />
