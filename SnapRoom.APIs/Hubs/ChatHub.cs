@@ -19,6 +19,14 @@ namespace SnapRoom.APIs.Hubs
 			_authService = authService;
 		}
 
+		// ✅ Client phải gọi hàm này sau khi kết nối
+		public async Task JoinConversation(string conversationId)
+		{
+			await Groups.AddToGroupAsync(Context.ConnectionId, conversationId);
+			Console.WriteLine($"✅ Client {Context.ConnectionId} joined group {conversationId}");
+		}
+
+
 		public async Task SendMessage(string senderId, string receiverId, string content)
 		{
 			Account? sender = await _unitOfWork.GetRepository<Account>().Entities
