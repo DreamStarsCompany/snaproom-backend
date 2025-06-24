@@ -17,8 +17,8 @@ namespace SnapRoom.Services
 
 		public Task SendVerificationMail(Account account)
 		{
-			string mail = "kidsvaccinecorp@gmail.com";
-			string pw = "swdg enlv vfrk rpdf";
+			string mail = "dreamstarscorp@gmail.com";
+			string pw = "spep pkbn vldn oyzd";
 
 			SmtpClient client = new SmtpClient("smtp.gmail.com", 587)
 			{
