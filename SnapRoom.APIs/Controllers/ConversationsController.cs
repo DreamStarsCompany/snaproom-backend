@@ -28,13 +28,13 @@ namespace SnapRoom.APIs.Controllers
 			));
 		}
 
-		[HttpGet("user/{id}")]
-		public async Task<IActionResult> GetConversation(string id)
+		[HttpGet("receiver/{receiverId}")]
+		public async Task<IActionResult> StartConversation(string receiverId)
 		{
-			var result = await _conversationService.GetConversation(id);
+			var result = await _conversationService.StartConversation(receiverId);
 			return Ok(new BaseResponse<object>(
 				statusCode: StatusCodeEnum.OK,
-				message: "Lấy đoạn chat thành công",
+				message: "Bắt đầu đoạn hội thoại thành công",
 				data: result
 			));
 		}

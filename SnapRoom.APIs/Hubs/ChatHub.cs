@@ -49,7 +49,6 @@ namespace SnapRoom.APIs.Hubs
 			{
 				conversation = new Conversation
 				{
-					Id = Guid.NewGuid().ToString(),
 					CustomerId = (sender.Role == RoleEnum.Customer) ? senderId : receiverId, // <-- You may need logic to assign properly
 					DesignerId = (sender.Role == RoleEnum.Customer) ? receiverId : senderId,
 				};

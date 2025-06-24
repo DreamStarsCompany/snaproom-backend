@@ -40,7 +40,7 @@ namespace SnapRoom.Services
 			return messages;
 		}
 
-		public async Task<object?> GetConversation(string otherUserId)
+		public async Task<object> StartConversation(string receiverId)
 		{
 			string userId = _authService.GetCurrentAccountId();
 
@@ -53,15 +53,36 @@ namespace SnapRoom.Services
 			}
 
 			Conversation? conversation = await _unitOfWork.GetRepository<Conversation>().Entities
-				.Where(c => (c.DesignerId == userId && c.CustomerId == otherUserId) || (c.DesignerId == otherUserId && c.CustomerId == userId))
+				.Where(c => (c.DesignerId == userId && c.CustomerId == receiverId) || (c.DesignerId == receiverId && c.CustomerId == userId))
 				.FirstOrDefaultAsync();
 
 
 			if (conversation == null)
-				return null; // No conversation yet
+			{
+				conversation = new Conversation
+				{
+					CustomerId = (user.Role == RoleEnum.Customer) ? userId : receiverId,
+					DesignerId = (user.Role == RoleEnum.Customer) ? receiverId : userId
+				};
+
+				Message initialMessage = new Message
+				{
+					SenderId = receiverId,
+					Content = "Bạn đã liên hệ với nhà thiết kế.\nChúng tôi sẽ phản hồi sớm nhất có thể. (Đây là tin nhắn tự động)",
+					ConversationId = conversation.Id
+				};
+
+				await _unitOfWork.GetRepository<Conversation>().InsertAsync(conversation);
+				await _unitOfWork.GetRepository<Message>().InsertAsync(initialMessage);
+				await _unitOfWork.SaveAsync();
+			}
+
+
 
 			return conversation.Id;
 		}
+
+
 
 		public async Task<object> GetConversations()
 		{
