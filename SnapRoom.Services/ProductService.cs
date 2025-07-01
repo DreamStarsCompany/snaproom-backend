@@ -54,6 +54,11 @@ namespace SnapRoom.Services
 		{
 			string designerId = _authService.GetCurrentAccountId();
 
+			return await GetDesignsByDesignerId(designerId, pageNumber, pageSize);
+		}
+
+		public async Task<BasePaginatedList<object>> GetDesignsByDesignerId(string designerId, int pageNumber, int pageSize)
+		{
 			Account? designer = await _unitOfWork.GetRepository<Account>().Entities.Where(a => a.Id == designerId && a.Role == RoleEnum.Designer && a.DeletedBy == null).FirstOrDefaultAsync();
 
 			if (designer == null)
@@ -84,6 +89,7 @@ namespace SnapRoom.Services
 			return new BasePaginatedList<object>(responseItems, query.Count, pageNumber, pageSize);
 		}
 
+
 		public async Task<BasePaginatedList<object>> GetFurnitures(int pageNumber, int pageSize)
 		{
 
@@ -113,8 +119,13 @@ namespace SnapRoom.Services
 
 		public async Task<BasePaginatedList<object>> GetFurnituresForDesigner(int pageNumber, int pageSize)
 		{
-
 			string designerId = _authService.GetCurrentAccountId();
+
+			return await GetFurnituresByDesignerId(designerId, pageNumber, pageSize);
+		}
+
+		public async Task<BasePaginatedList<object>> GetFurnituresByDesignerId(string designerId, int pageNumber, int pageSize)
+		{
 
 			Account? designer = await _unitOfWork.GetRepository<Account>().Entities.Where(a => a.Id == designerId && a.Role == RoleEnum.Designer && a.DeletedBy == null).FirstOrDefaultAsync();
 
@@ -125,7 +136,6 @@ namespace SnapRoom.Services
 
 			List<Product> query = await _unitOfWork.GetRepository<Product>().Entities
 				.Where(p => p.Furniture != null && p.DesignerId == designerId).ToListAsync();
-
 
 			var responseItems = query.Select(x => new
 			{
@@ -147,6 +157,7 @@ namespace SnapRoom.Services
 
 			return new BasePaginatedList<object>(responseItems, query.Count, pageNumber, pageSize);
 		}
+
 
 		public async Task<BasePaginatedList<object>> GetNewProducts(int pageNumber, int pageSize)
 		{

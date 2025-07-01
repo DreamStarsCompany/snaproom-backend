@@ -19,7 +19,7 @@ namespace SnapRoom.APIs.Controllers
 		}
 
 		[HttpGet]
-		public async Task<IActionResult> CustomerLogin(RoleEnum? role, int pageNumber, int pageSize)
+		public async Task<IActionResult> GetAccounts(RoleEnum? role, int pageNumber = -1, int pageSize = -1)
 		{
 			var accounts = await _accountService.GetAccounts(role, pageNumber, pageSize);
 
@@ -31,7 +31,7 @@ namespace SnapRoom.APIs.Controllers
 		}
 
 		[HttpGet("awaiting-designers")]
-		public async Task<IActionResult> GetAwaitingDesigners(int pageNumber, int pageSize)
+		public async Task<IActionResult> GetAwaitingDesigners(int pageNumber = -1, int pageSize = -1)
 		{
 			var accounts = await _accountService.GetAwaitingDesigners(pageNumber, pageSize);
 

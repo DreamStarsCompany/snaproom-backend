@@ -28,7 +28,7 @@ namespace SnapRoom.Services
 		public async Task<BasePaginatedList<object>> GetAccounts(RoleEnum? role, int pageNumber, int pageSize)
 		{
 			List<Account> query = await _unitOfWork.GetRepository<Account>().Entities
-				.Where(a => (role == null || a.Role == role) && a.DeletedBy == null).ToListAsync();
+				.Where(a => (role == null || a.Role == role) && a.VerificationToken == null && a.DeletedBy == null).ToListAsync();
 
 			var responseItems = query.Select(x => new
 			{

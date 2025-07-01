@@ -9,5 +9,6 @@
 		Task<object> GetRevenueByDayForDesigner(int month, int year);
 		Task<object> GetTopSellingProducts(int topN);
 		Task<object> GetTopSellingProductsWithComments(int topN);
+		Task<object> GetTotalProductReviews();
 	}
 }

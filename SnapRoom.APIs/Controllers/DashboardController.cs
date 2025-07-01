@@ -93,6 +93,16 @@ namespace SnapRoom.APIs.Controllers
 			));
 		}
 
+		[HttpGet("total-reviews")]
+		public async Task<IActionResult> GetTotalProductReviews()
+		{
+			var result = await _dashboardService.GetTotalProductReviews();
+			return Ok(new BaseResponse<object>(
+				statusCode: StatusCodeEnum.OK,
+				message: "Lấy dữ liệu thành công",
+				data: result
+			));
+		}
 
 	}
 }

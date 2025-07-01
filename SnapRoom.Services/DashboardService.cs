@@ -265,6 +265,18 @@ namespace SnapRoom.Services
 			return topProducts;
 		}
 
+		public async Task<object> GetTotalProductReviews()
+		{
+
+			int totalReviews = await _unitOfWork.GetRepository<ProductReview>().Entities
+				.CountAsync(r => r.Product != null && r.Product.DeletedBy == null);
+
+			return new
+			{
+				totalReviews
+			};
+		}
+
 
 	}
 }
