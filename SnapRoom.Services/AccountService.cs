@@ -38,7 +38,8 @@ namespace SnapRoom.Services
 				x.Profession,
 				x.ContactNumber,
 				x.Role,
-				x.ApplicationUrl
+				x.ApplicationUrl,
+				x.AvatarSource
 			}).ToList();
 
 			return new BasePaginatedList<object>(responseItems, query.Count, pageNumber, pageSize);
