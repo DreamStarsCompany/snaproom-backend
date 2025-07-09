@@ -58,6 +58,7 @@ namespace SnapRoom.Services
 
 			var payOS = new PayOS(clientId, apiKey, checksumKey);
 			string backendUrl = _config["BACKEND_URL"]!;
+			string frontendUrl = _config["FRONTEND_URL"]!;
 
 			var paymentLinkRequest = new PaymentData(
 				orderCode: int.Parse(DateTimeOffset.Now.ToString("ffffff")),
@@ -65,7 +66,7 @@ namespace SnapRoom.Services
 				description: "Thanh toan don hang",
 				items: items,
 				returnUrl: backendUrl + $"/api/orders/{cart.Id}/1",
-				cancelUrl: "https://google.com"
+				cancelUrl: frontendUrl + $"/customerCart"
 			);
 			var response = await payOS.createPaymentLink(paymentLinkRequest);
 

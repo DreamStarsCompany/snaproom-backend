@@ -72,7 +72,7 @@ namespace SnapRoom.APIs.Controllers
 		{
 			await _authService.VerifyAccount(token);
 
-			return Redirect("https://www.google.com/");
+			return Redirect(_config["FRONTEND_URL"]! + "/login");
 		}
 
 		[HttpPost("application-result")]
@@ -116,7 +116,6 @@ namespace SnapRoom.APIs.Controllers
 		public async Task<IActionResult> VerifyResetPassowrd(string token)
 		{
 			await _authService.VerifyResetPassowrd(token);
-			//return Redirect("https://google.com");
 
 			return Redirect(_config["FRONTEND_URL"]! + $"/reset-password?token={token}");
 		}
