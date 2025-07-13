@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace SnapRoom.Repositories.Migrations
 {
     /// <inheritdoc />
-    public partial class newStart : Migration
+    public partial class NewStart : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
