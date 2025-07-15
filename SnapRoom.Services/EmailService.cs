@@ -8,25 +8,23 @@ namespace SnapRoom.Services
 {
 	public class EmailService
 	{
-		private readonly IConfiguration _confg;
+		private readonly IConfiguration _config;
 
 		public EmailService(IConfiguration config)
 		{
-			_confg = config;
+			_config = config;
 		}
 
 		public Task SendVerificationMail(Account account)
 		{
-			string mail = "dreamstarscorp@gmail.com";
-			string pw = "spep pkbn vldn oyzd";
 
-			SmtpClient client = new SmtpClient("smtp.gmail.com", 587)
+			SmtpClient client = new SmtpClient(_config["SMTP:Server"], 587)
 			{
 				EnableSsl = true,
-				Credentials = new NetworkCredential(mail, pw)
+				Credentials = new NetworkCredential(_config["SMTP:Mail"], _config["SMTP:Password"])
 			};
 
-			string backendUrl = _confg["BACKEND_URL"]!;
+			string backendUrl = _config["BACKEND_URL"]!;
 
 			string verificationUrl = $"{backendUrl}/api/auth/verify-account?token={account.VerificationToken}";
 			string body = "";
@@ -85,7 +83,7 @@ namespace SnapRoom.Services
 
 			var mailMessage = new MailMessage
 			{
-				From = new MailAddress(mail),
+				From = new MailAddress(_config["SMTP:Mail"]!),
 				Subject = "Xác minh tài khoản SnapRoom",
 				Body = body,
 				IsBodyHtml = true
@@ -100,16 +98,14 @@ namespace SnapRoom.Services
 
 		public Task SendResetPasswordEmail(string email, string resetToken)
 		{
-			var mail = "kidsvaccinecorp@gmail.com";
-			var pw = "swdg enlv vfrk rpdf";
 
-			var client = new SmtpClient("smtp.gmail.com", 587)
+			SmtpClient client = new SmtpClient(_config["SMTP:Server"], 587)
 			{
 				EnableSsl = true,
-				Credentials = new NetworkCredential(mail, pw)
+				Credentials = new NetworkCredential(_config["SMTP:Mail"], _config["SMTP:Password"])
 			};
 
-			var backendUrl = _confg["BACKEND_URL"];
+			var backendUrl = _config["BACKEND_URL"];
 			string resetUrl = $"{backendUrl}/api/auth/verify-reset-password?token={resetToken}";
 			string imageUrl = "https://dataimage.blob.core.windows.net/snaproom/app-banner.png";
 
@@ -140,7 +136,7 @@ namespace SnapRoom.Services
 
 			var mailMessage = new MailMessage
 			{
-				From = new MailAddress(mail),
+				From = new MailAddress(_config["SMTP:Mail"]!),
 				Subject = "Xác minh tài khoản Kids Vaccine",
 				Body = body,
 				IsBodyHtml = true
@@ -155,16 +151,13 @@ namespace SnapRoom.Services
 
 		public Task SendUpdateEmailEmail(string newEmail, string otp)
 		{
-			var mail = "kidsvaccinecorp@gmail.com";
-			var pw = "swdg enlv vfrk rpdf";
-
-			var client = new SmtpClient("smtp.gmail.com", 587)
+			SmtpClient client = new SmtpClient(_config["SMTP:Server"], 587)
 			{
 				EnableSsl = true,
-				Credentials = new NetworkCredential(mail, pw)
+				Credentials = new NetworkCredential(_config["SMTP:Mail"], _config["SMTP:Password"])
 			};
 
-			var backendUrl = _confg["BACKEND_URL"];
+			var backendUrl = _config["BACKEND_URL"];
 			string updateEmailUrl = $"{backendUrl}/api/authentication/verify-reset-password?token={otp}";
 
 			var body = $@"
@@ -186,7 +179,7 @@ namespace SnapRoom.Services
 				</div>";
 			var mailMessage = new MailMessage
 			{
-				From = new MailAddress(mail),
+				From = new MailAddress(_config["SMTP:Mail"]!),
 				Subject = "Xác minh tài khoản Kids Vaccine",
 				Body = body,
 				IsBodyHtml = true
@@ -202,13 +195,10 @@ namespace SnapRoom.Services
 
 		public Task SendApplicationResultMail(string email, bool isApproved)
 		{
-			var mail = "kidsvaccinecorp@gmail.com";
-			var pw = "swdg enlv vfrk rpdf";
-
-			var client = new SmtpClient("smtp.gmail.com", 587)
+			SmtpClient client = new SmtpClient(_config["SMTP:Server"], 587)
 			{
 				EnableSsl = true,
-				Credentials = new NetworkCredential(mail, pw)
+				Credentials = new NetworkCredential(_config["SMTP:Mail"], _config["SMTP:Password"])
 			};
 
 
@@ -240,7 +230,7 @@ namespace SnapRoom.Services
 
 			var mailMessage = new MailMessage
 			{
-				From = new MailAddress(mail),
+				From = new MailAddress(_config["SMTP:Mail"]!),
 				Subject = "Xác minh tài khoản SnapRoom",
 				Body = body,
 				IsBodyHtml = true
